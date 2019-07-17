@@ -8,7 +8,7 @@ import struct
 from handler.encodeutil import AesEncoder
 
 
-class DataProtocol:
+class DataProtocol(object):
 
     def __init__(self):
         self.handfrt = "iii"

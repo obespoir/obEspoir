@@ -64,7 +64,7 @@ class Server(object):
         "http协议 web"
         app = web.Application()
         self.web_handler["/update_config"] = self.update_config_remote
-        for k, v in self.web_handler:
+        for k, v in self.web_handler.items():
             app.router.add_route("*", k, v)
         runner = web.AppRunner(app)
         await runner.setup()
@@ -80,19 +80,22 @@ class Server(object):
         """
         host = config.get("host")
         self.host = host
-        ws_port = config.get("ws_port", 0)      # web_socket port
-        web_port = config.get("web_port", 0)    # web http port
-        rpc_port = config.get("rpc_port", 0)    # rpc port
+        ws_port = config["websocket"].get("ws_port", 0)      # web_socket port
+        web_port = config["http"].get("web_port", 0)    # web http port
+        rpc_port = config["rpc"].get("rpc_port", 0)    # rpc port
         remote_ports = config.get("remote_ports", [])   # remote_ports list
+        print([self.host, ws_port, web_port, rpc_port])
 
         if ws_port and self.socket_handler:
-            GlobalObject().ws_server = self.loop.run_until_complete(websockets.serve(self.socket_handler, self.host, ws_port))
+            GlobalObject().ws_server = self.loop.run_until_complete(
+                websockets.serve(self.socket_handler, self.host, ws_port))
 
         if web_port and self.web_handler:
-            GlobalObject().http_server = self.loop.run_until_complete(self.start_web(web))
+            GlobalObject().http_server = self.loop.run_until_complete(self.start_web(web_port))
 
         if rpc_port:
-            GlobalObject().rpc_server = self.loop.run_until_complete(self.loop.create_server(ObProtocol, self.host, rpc_port))
+            GlobalObject().rpc_server = self.loop.run_until_complete(
+                self.loop.create_server(ObProtocol, self.host, rpc_port))
 
         if remote_ports:
             for rp in remote_ports:

@@ -17,10 +17,16 @@ class RpcConnectionManager(object):
     def __gen_name(self, host, port):
         return "{}_{}".format(host, port)
 
+    def get_transport(self, host, port):
+        name = self.__gen_name(host, port)
+        if name not in self.conns.keys() or 1 != self.conns[name]["status"]:
+            return None
+        return self.conns[name]["transport"]
+
     def store_connection(self, host, port, transport):
         self.conns[self.__gen_name(host, port)] = {"status": 1, "transport": transport}
 
-    def lost_connection(self, host, port, transport):
+    def lost_connection(self, host, port):
         name = self.__gen_name(host, port)
         if name not in self.conns.keys():
             logger.warn("can not find connection {}".format(name))

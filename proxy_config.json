@@ -4,12 +4,31 @@
     "log_dir": "/data/logs/obEspoir/",                           // 项目运行日志存放目录（不同测试环境目录不同）
 
     "host": "127.0.0.1",
-    "type": 1,
-    "ws_port": 20000,
-    "web_port": 20001,
-    "rpc_port": 20002,
+    "websocket": {
+        "port": 20000,
+        "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 websocket通信
+        "encode": 0                                       // 是否启用加密
+    },
+    "http": {
+        "port": 20001,
+        "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 http web通信
+        "encode": 0                                       // 是否启用加密
+    },
+    "rpc": {
+        "port": 20002,
+        "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 rpc通信
+        "encode": 0,                                      // 是否启用加密
+        "type": 1                                         // 节点类型
+    },
+
     "remote_ports": [
-        {"host": "127.0.0.1", "port":  21002}
+        {
+            "host": "127.0.0.1",
+            "port":  21002,
+            "token": "helloworldiloveyou~1234567890123",
+            "encode": 0,
+            "type": 0                      // 节点类型
+        }
     ]
 
 }

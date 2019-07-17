@@ -20,7 +20,7 @@ class RpcPushProtocol(asyncio.Protocol):
         self.host, self.port = address
         RpcConnectionManager().store_connection(*address, transport)
         logger.debug(
-            'connecting to {} port {}'.format(*address)
+            'connected to {} port {}'.format(*address)
         )
 
     def data_received(self, data):
@@ -28,13 +28,14 @@ class RpcPushProtocol(asyncio.Protocol):
 
     def eof_received(self):
         logger.debug('received EOF')
-        if self.transport.can_write_eof():
-            self.transport.write_eof()
-        self.transport.close()
+        transport = RpcConnectionManager().get_transport(self.host, self.port)
+        if transport and transport.can_write_eof():
+            transport.write_eof()
+        RpcConnectionManager().lost_connection(self.host, self.port)
 
     def connnection_lost(self, exc):
         logger.debug('server closed connection')
-        self.transport.close()
+        RpcConnectionManager().lost_connection(self.host, self.port)
         super().connectiong_lost(exc)
 
 

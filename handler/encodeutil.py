@@ -21,7 +21,7 @@ class AesEncoder(object):
     NONE_TYPE = 0
     AES_TYPE = 1
 
-    def __init__(self, password='helloworldiloveyou~', encode_type=1):
+    def __init__(self, password='helloworldiloveyou~1234567890123', encode_type=1):
         self.aes_obj = AES.new(password)
         self.encode_type = encode_type
 
