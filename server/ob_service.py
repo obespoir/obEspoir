@@ -18,7 +18,7 @@ class ObService(object):
     def __iter__(self):
         return self._targets.values()
 
-    def mapTarget(self, target):
+    def map_target(self, target):
         """Add a target to the service."""
         self._lock.acquire()
         try:
@@ -31,7 +31,7 @@ class ObService(object):
         finally:
             self._lock.release()
 
-    def unMapTarget(self, target):
+    def unmap_target(self, target):
         """Remove a target from the service."""
         self._lock.acquire()
         try:
@@ -41,7 +41,7 @@ class ObService(object):
         finally:
             self._lock.release()
 
-    def unMapTargetByKey(self, targetKey):
+    def unmap_target_by_key(self, targetKey):
         """Remove a target from the service."""
         self._lock.acquire()
         try:
@@ -49,7 +49,7 @@ class ObService(object):
         finally:
             self._lock.release()
 
-    def getTarget(self, targetKey):
+    def get_target(self, targetKey):
         """Get a target from the service by name."""
         self._lock.acquire()
         try:
@@ -58,13 +58,13 @@ class ObService(object):
             self._lock.release()
         return target
 
-    async def callTarget(self, targetKey, *args, **kw):
+    async def call_target(self, targetKey, *args, **kw):
         '''call Target
         @param conn: client connection
         @param targetKey: target ID
         @param data: client data
         '''
-        target = self.getTarget(targetKey)
+        target = self.get_target(targetKey)
 
         self._lock.acquire()
         try:
@@ -80,7 +80,12 @@ class ObService(object):
 
 
 rpc_service = ObService()
+websocket_service = ObService()
 
 
 def RpcServiceHandle(target):
-    rpc_service.mapTarget(target)
+    rpc_service.map_target(target)
+
+
+def WebSocketServiceHandle(target):
+    websocket_service.map_target(target)

@@ -7,7 +7,16 @@
     "websocket": {
         "port": 20000,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 websocket通信
-        "encode": 0                                       // 是否启用加密
+        "encode": 0,                                      // 是否启用加密
+        "timeout": 300,                                   //多久连接超时（单位为秒）
+        "route": {                                        //配置消息分发的路由
+            "range": {
+                "game": [[0, 100000]]
+            },
+            "special": {
+                            // like "game": [110119]
+            }
+        }
     },
     "http": {
         "port": 20001,
@@ -18,7 +27,7 @@
         "port": 20002,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 rpc通信
         "encode": 0,                                      // 是否启用加密
-        "type": 1                                         // 节点类型
+        "type": "proxy"                                   // 节点类型
     },
 
     "remote_ports": [
@@ -27,7 +36,7 @@
             "port":  21002,
             "token": "helloworldiloveyou~1234567890123",
             "encode": 0,
-            "type": 0                      // 节点类型
+            "type": "game"                      // 节点类型(字符串标识)
         }
     ]
 

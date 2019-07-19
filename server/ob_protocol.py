@@ -4,48 +4,54 @@ author = jamon
 """
 
 import asyncio
+import struct
 import traceback
 import ujson
 
-from functools import wraps
 from share.ob_log import logger
+from share.encodeutil import AesEncoder
 from server.ob_service import rpc_service
 
+
+class DataException(Exception):
+
+    pass
+    
 
 class ObProtocol(asyncio.Protocol):
     """消息协议，包含消息处理"""
 
+    def __init__(self):
+        self.handfrt = "iii"  # (int, int, int)  -> (message_length, command_id, version)
+        self.identifier = 0
+        self.encode_ins = None
+        self.version = 0
+
+        self._buffer = b""    # 数据缓冲buffer
+        self._head = None     # 消息头
+
+    def pack(self, data, command_id):
+        """
+        打包消息， 用於傳輸
+        :param data:  傳輸數據
+        :param command_id:  消息ID
+        :return:
+        """
+        pass
+
+    def process_data(self, data):
+        pass
+
     def connection_made(self, transport):
-        self.transport = transport
-        self.address = transport.get_extra_info('peername')
-        logger.debug('connection accepted')
+        pass
 
     def data_received(self, data):
-        logger.debug('received {!r}'.format(data))
-        result = ""
-        if not isinstance(data, dict):
-            try:
-                data = ujson.loads(data)
-            except Exception as e:
-                logger.warn("param error:{0}".format(data))
-                return
-
-        if data.get("message_id", 0):
-            result = ujson.dumps({"code": 0, "desc": "error"})
-        else:
-            result = rpc_service.callTarget(data["message_id"], data)
-        self.transport.write(result)
+        pass
 
     def eof_received(self):
-        logger.debug('received EOF')
-        if self.transport.can_write_eof():
-            self.transport.write_eof()
+        pass
 
     def connection_lost(self, error):
-        if error:
-            logger.error('ERROR: {}'.format(error))
-        else:
-            logger.debug('closing')
-        super().connection_lost(error)
+        pass
 
 

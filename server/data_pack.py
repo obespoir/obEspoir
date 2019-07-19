@@ -5,22 +5,22 @@ author = jamon
 
 import struct
 
-from handler.encodeutil import AesEncoder
+from share.encodeutil import AesEncoder
 
 
-class DataProtocol(object):
+class DataPack(object):
 
-    def __init__(self):
-        self.handfrt = "iii"
+    def __init__(self, password, is_encode=0):
+        self.handfrt = "iii"        # (int, int, int)  -> (message_length, command_id, version)
         self.identifier = 0
         self.aes_ins = AesEncoder()
         self.version = 0
 
-    def _get_head_len(self):
+    def get_head_len(self):
         return struct.calcsize(self.handfrt)
 
-    def _unpack(self, pack_data):
-        head_len = self._get_head_len()
+    def unpack(self, pack_data):
+        head_len = self.get_head_len()
         if head_len > len(pack_data):
             return None
 
@@ -33,7 +33,7 @@ class DataProtocol(object):
 
         return {'result': True, 'command': list_head[1], 'data': result}
 
-    def _pack(self, data, command_id):
+    def pack(self, data, command_id):
         """
         打包消息， 用於傳輸
         :param data:  傳輸數據
@@ -42,6 +42,6 @@ class DataProtocol(object):
         """
         data = self.aes_ins.encode(data)
         data = "%s" % data
-        length = data.__len__() + self._get_head_len()
+        length = data.__len__() + self.get_head_len()
         head = struct.pack(self.handfrt, length, command_id, self.version)
         return str(head + data)

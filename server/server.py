@@ -80,11 +80,13 @@ class Server(object):
         """
         host = config.get("host")
         self.host = host
-        ws_port = config["websocket"].get("ws_port", 0)      # web_socket port
-        web_port = config["http"].get("web_port", 0)    # web http port
-        rpc_port = config["rpc"].get("rpc_port", 0)    # rpc port
+        ws_port = config["websocket"].get("port", 0)      # web_socket port
+        web_port = config["http"].get("port", 0)    # web http port
+        rpc_port = config["rpc"].get("port", 0)    # rpc port
         remote_ports = config.get("remote_ports", [])   # remote_ports list
         print([self.host, ws_port, web_port, rpc_port])
+
+        GlobalObject().init_from_config(config)
 
         if ws_port and self.socket_handler:
             GlobalObject().ws_server = self.loop.run_until_complete(
@@ -98,6 +100,7 @@ class Server(object):
                 self.loop.create_server(ObProtocol, self.host, rpc_port))
 
         if remote_ports:
+            await asyncio.sleep(10)    # 休眠一段时间等待其他服务启动
             for rp in remote_ports:
                 host = rp.get("host", "")
                 port = rp.get("port", 0)
