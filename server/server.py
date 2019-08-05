@@ -84,7 +84,7 @@ class Server(object):
         web_port = config["http"].get("port", 0)    # web http port
         rpc_port = config["rpc"].get("port", 0)    # rpc port
         remote_ports = config.get("remote_ports", [])   # remote_ports list
-        print([self.host, ws_port, web_port, rpc_port])
+        # print([self.host, ws_port, web_port, rpc_port])
 
         GlobalObject().init_from_config(config)
 
@@ -100,17 +100,21 @@ class Server(object):
                 self.loop.create_server(ObProtocol, self.host, rpc_port))
 
         if remote_ports:
-            await asyncio.sleep(10)    # 休眠一段时间等待其他服务启动
             for rp in remote_ports:
                 host = rp.get("host", "")
                 port = rp.get("port", 0)
-                s_type = rp.get('type', 1)
+                s_type = rp.get('type')
                 if host and port:
                     remote_serv = self.loop.create_connection(RpcPushProtocol, host=host, port=port)
                     RpcConnectionManager().add_type_node(s_type, host, port)
+                    # RpcConnectionManager().type_dict = {"adfa": 909090}
+                    # print("adafdaf", id(RpcConnectionManager()), id(RpcConnectionManager().type_dict), RpcConnectionManager().type_dict)
+                    # c = "afdsa"
+                    # print("dafaadafdaf",id(RpcConnectionManager()),  id(RpcConnectionManager().type_dict), RpcConnectionManager().type_dict)
                     try:
                         self.loop.run_until_complete(remote_serv)
-                    except ConnectionRefusedError as e:
+                    except ConnectionRefusedError:
+                        print("HERE", RpcConnectionManager().conns)
                         logger.info("connect to {}:{} failed!".format(host, port))
 
     async def update_config_remote(self, server_type, addr_info={}):
@@ -128,18 +132,39 @@ class Server(object):
                 RpcConnectionManager().conns.pop(r)
         for k, v in addr_info.items():
             name = "{}_{}".format(k, v)
-            if name not in RpcConnectionManager().conn.keys() or RpcConnectionManager().conns[name].status != 1:
+            if name not in RpcConnectionManager().conns.keys() or RpcConnectionManager().conns[name]["status"] != 1:
                 RpcConnectionManager().add_type_node(server_type, k, v)
-                remote_serv = await self.loop.create_connection(RpcPushProtocol, host=k, port=v)
                 try:
-                    self.loop.run_until_complete(remote_serv)
+                    await self.loop.create_connection(RpcPushProtocol, host=k, port=v)
+                    logger.info("success connect to {}:{}".format(k, v))
                 except ConnectionRefusedError as e:
-                    logger.error("connect to {}:{} failed!")
+                    logger.error("try connect to {}:{} failed!")
 
     async def send_message(self, remote_name, message):
         if remote_name not in RpcConnectionManager().conns.keys():
             return
         await RpcConnectionManager().send_message(remote_name, message)
+
+    def start(self, config):
+        self.config(config)
+        self.loop.run_until_complete(self.schedule())
+        self.run()
+
+    async def schedule(self):
+        # 定时rpc断线重连
+        await asyncio.sleep(3)
+        logger.info("start new schedule task~")
+        print(RpcConnectionManager().type_dict, RpcConnectionManager().conns)
+        for node_type, name_lst in RpcConnectionManager().type_dict.items():
+            for name in name_lst:
+                if name not in RpcConnectionManager().conns.keys()\
+                        or 1!=RpcConnectionManager().conns[name]["status"]:
+                    host, port = name.split("_")
+                    try:
+                        await self.loop.create_connection(RpcPushProtocol, host=host, port=port)
+                        logger.info("success connect to {}:{}".format(host, port))
+                    except ConnectionRefusedError as e:
+                        logger.error("schedule try connect to {}:{} failed!")
 
     def run(self):
         try:

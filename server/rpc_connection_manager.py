@@ -7,8 +7,8 @@ from share.ob_log import logger
 from share.singleton import Singleton
 
 
-class RpcConnectionManager(object):
-    __metaclass__ = Singleton
+class RpcConnectionManager(object, metaclass=Singleton):
+    # __metaclass__ = Singleton
 
     def __init__(self):
         self.conns = {}     # {conn_name: {status: int(0:未连接，1：连接中，2：连接断开), transport: transport}}
@@ -48,6 +48,7 @@ class RpcConnectionManager(object):
         else:
             if name not in self.type_dict[node_type]:
                 self.type_dict[node_type].append(name)
+        print(self.type_dict, id(self), id(self.type_dict))
 
     def del_type_node(self, node_type, host, port):
         name = self.__gen_name(host, port)
