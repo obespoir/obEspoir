@@ -15,8 +15,7 @@ pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 unpad = lambda s : s[0:-ord(s[-1])]
 
 
-class AesEncoder(object):
-    __metaclass__ = Singleton
+class AesEncoder(object, metaclass=Singleton):
 
     NONE_TYPE = 0
     AES_TYPE = 1

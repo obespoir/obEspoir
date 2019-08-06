@@ -16,9 +16,7 @@ from server.ws_protocol import WebSocketProtocol
 from server.remote_service import call_remote_service
 
 
-class WebsocketHandler(object):
-
-    __metaclass__ = Singleton
+class WebsocketHandler(object, metaclass=Singleton):
 
     def __init__(self):
         self.protocol = WebSocketProtocol()

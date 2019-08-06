@@ -6,11 +6,10 @@ author = jamon
 from share.singleton import Singleton
 
 
-class GlobalObject:
+class GlobalObject(object, metaclass=Singleton):
     """
     全局对象
     """
-    __metaclass__ = Singleton
 
     def __init__(self):
         self.http_server = None           # http server
