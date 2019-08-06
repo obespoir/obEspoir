@@ -24,7 +24,7 @@ class ObProtocol(asyncio.Protocol):
     def __init__(self):
         self.handfrt = "iii"  # (int, int, int)  -> (message_length, command_id, version)
         self.identifier = 0
-        self.encode_ins = None
+        # self.encode_ins = None
         self.version = 0
 
         self._buffer = b""    # 数据缓冲buffer

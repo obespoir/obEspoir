@@ -36,36 +36,41 @@ class RpcProtocol(ObProtocol):
         打包消息， 用於傳輸
         :param data:  傳輸數據
         :param command_id:  消息ID
-        :return:
+        :return: bytes
         """
         data = self.encode_ins.encode(data)
-        data = "%s" % data
+        # data = "%s" % data
         length = data.__len__() + self.head_len
+        print("aaaaaa:", length)
         head = struct.pack(self.handfrt, length, command_id, self.version)
-        return str(head + data)
+        return head + data
 
     def process_data(self, data):
+        if isinstance(data, str):
+            data = bytes(data, encoding='utf8')
         self._buffer += data
         _buffer = None
-
         if self._head is None:
             if len(self._buffer) < self.head_len:
                 return
-            self._head = self._buffer[:self.head_len]       # 包头
-            self._buffer = self._buffer[self.head_len:]
 
-        if len(self._buffer) > self._head[0]:
-            data = self.encode_ins.decode_aes(self._buffer[:self._head[0]])   # 解密
+            self._head = struct.unpack(self.handfrt, self._buffer[:self.head_len])  # 包头
+            self._buffer = self._buffer[self.head_len:]
+        content_len = self._head[0] - self.head_len
+        print("here22222:", content_len, len(self._buffer))
+        if len(self._buffer) >= content_len:
+            data = self.encode_ins.decode(self._buffer[:content_len])  # 解密
             if not data:
                 raise DataException()
-            self.message_handle(self._head[1], self._head[2], data)
+            print("dadaaaaaaa")
+            asyncio.ensure_future(self.message_handle(self._head[1], self._head[2], data), loop=GlobalObject().loop)
 
-            _buffer = self._buffer[self._head[0]:]
+            _buffer = self._buffer[content_len:]
             self._buffer = b""
             self._head = None
         return _buffer
 
-    def message_handle(self, command_id, version, data):
+    async def message_handle(self, command_id, version, data):
         """
         实际处理消息
         :param command_id:
@@ -73,8 +78,9 @@ class RpcProtocol(ObProtocol):
         :param data:
         :return:
         """
-        result = rpc_service.call_target(command_id, data)
-        self.transport.write(self.pack(command_id, result))
+        print("message_handle:", command_id, data)
+        result = await rpc_service.call_target(command_id, data)
+        self.transport.write(self.pack(result, command_id))
 
     def connection_made(self, transport):
         self.transport = transport
@@ -85,6 +91,7 @@ class RpcProtocol(ObProtocol):
         logger.debug('received {!r}'.format(data))
         while data:     # 解决TCP粘包问题
             data = self.process_data(data)
+            # data = asyncio.run(self.process_data(data))
 
     def eof_received(self):
         logger.debug('received EOF')

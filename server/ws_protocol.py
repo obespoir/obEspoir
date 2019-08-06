@@ -22,7 +22,7 @@ class WebSocketProtocol(ObProtocol):
 
         self.encode_ins = AesEncoder(GlobalObject().rpc_password, encode_type=GlobalObject().rpc_encode_type)
         self.version = 0
-
+        print("hhhhhh:", id(self), self.encode_ins)
         self._buffer = b""    # 数据缓冲buffer
         self._head = None     # 消息头, list,   [message_length, command_id, version]
         self.transport = None
@@ -33,36 +33,35 @@ class WebSocketProtocol(ObProtocol):
         打包消息， 用於傳輸
         :param data:  傳輸數據
         :param command_id:  消息ID
-        :return:
+        :return: bytes
         """
         data = self.encode_ins.encode(data)
-        data = "%s" % data
         length = data.__len__() + self.head_len
         head = struct.pack(self.handfrt, length, command_id, self.version)
-        return str(head + data)
+        return head + data
 
-    def process_data(self, data):
-        self._buffer += bytes(data, encoding='utf-8')
+    async def process_data(self, data, websocket):
+        self._buffer += bytes(data, encoding='utf8')
         _buffer = None
-
         if self._head is None:
             if len(self._buffer) < self.head_len:
                 return
-            self._head = self._buffer[:self.head_len]       # 包头
-            self._buffer = self._buffer[self.head_len:]
 
-        if len(self._buffer) > self._head[0]:
-            data = self.encode_ins.decode_aes(self._buffer[:self._head[0]])   # 解密
+            self._head = struct.unpack(self.handfrt, self._buffer[:self.head_len])      # 包头
+            self._buffer = self._buffer[self.head_len:]
+        content_len = self._head[0] - self.head_len
+        if len(self._buffer) >= content_len:
+            data = self.encode_ins.decode(self._buffer[:content_len])   # 解密
             if not data:
                 raise DataException()
-            self.message_handle(self._head[1], self._head[2], data)
+            await self.message_handle(self._head[1], self._head[2], data, websocket)
 
-            _buffer = self._buffer[self._head[0]:]
+            _buffer = self._buffer[content_len:]
             self._buffer = b""
             self._head = None
         return _buffer
 
-    def message_handle(self, command_id, version, data):
+    async def message_handle(self, command_id, version, data, websocket):
         """
         实际处理消息
         :param command_id:
@@ -70,6 +69,7 @@ class WebSocketProtocol(ObProtocol):
         :param data:
         :return:
         """
-        result = websocket_service.call_target(0, data)
+        print("message_handle:", data)
+        result = await websocket_service.call_target(0, data)
         if result:
-            self.transport.write(self.pack(command_id, result))
+            websocket.send(self.pack(command_id, result).decode("utf8"))

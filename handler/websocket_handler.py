@@ -4,6 +4,7 @@ author = jamon
 """
 
 import asyncio
+import ujson
 
 from websockets.exceptions import ConnectionClosed
 
@@ -13,7 +14,7 @@ from server.ob_protocol import DataException
 from server.ob_service import WebSocketServiceHandle
 from server.global_object import GlobalObject
 from server.ws_protocol import WebSocketProtocol
-from server.remote_service import call_remote_service
+from server.remote_service import send_message
 
 
 class WebsocketHandler(object, metaclass=Singleton):
@@ -28,7 +29,7 @@ class WebsocketHandler(object, metaclass=Singleton):
                 data = await asyncio.wait_for(websocket.recv(), timeout=GlobalObject().ws_timeout)
                 logger.debug('websocket received {!r}'.format(data))
                 while data:  # 解决TCP粘包问题
-                    data = self.protocol.process_data(data)
+                    data = await self.protocol.process_data(data, websocket)
             except asyncio.TimeoutError:
                 logger.info("{} connection timeout!".format(websocket.remote_address))
                 await websocket.close()
@@ -42,13 +43,21 @@ class WebsocketHandler(object, metaclass=Singleton):
 
 
 @WebSocketServiceHandle
-def forward_0(command_id, data):
+async def forward_0(command_id, data):
     """
     消息转发
-    :param command_id:
-    :param data:
+    :param command_id: int
+    :param data: json
     :return:
     """
+    print("forward_0", command_id, data, type(data))
+    if not isinstance(data, dict):
+        try:
+            data = ujson.loads(data)
+            print("data type :", type(data))
+        except Exception:
+            logger.warn("param data parse error {}".format(data))
+            return {}
     data.update({"message_id": command_id})
     next_node = None
     for node, route in GlobalObject().ws_route["special"].items():
@@ -64,10 +73,10 @@ def forward_0(command_id, data):
                 if command_id >= r[0] and command_id<=r[1]:
                     next_node = node
                     break
-
+    print("next_node:", next_node)
     if not next_node:
         logger.info("can not find route node for message {}".format(command_id))
-        return
+        return {}
     else:
-        return call_remote_service(next_node, data)
+        return await send_message(next_node, command_id, data)
 

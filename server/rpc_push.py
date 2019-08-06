@@ -4,8 +4,11 @@ author = jamon
 """
 
 import asyncio
+import struct
 
+from server.global_object import GlobalObject
 from server.rpc_connection_manager import RpcConnectionManager
+from share.encodeutil import AesEncoder
 from share.ob_log import logger
 
 
@@ -14,11 +17,42 @@ class RpcPushProtocol(asyncio.Protocol):
     def __init__(self):
         self.host = None
         self.port = None
+        self.handfrt = "iii"  # (int, int, int)  -> (message_length, command_id, version)
+        self.head_len = struct.calcsize(self.handfrt)
+        self.identifier = 0
+
+        self.encode_ins = AesEncoder(GlobalObject().rpc_password, encode_type=GlobalObject().rpc_encode_type)
+        self.version = 0
+
+        self._buffer = b""    # 数据缓冲buffer
+        self._head = None     # 消息头, list,   [message_length, command_id, version]
+        self.transport = None
+        super().__init__()
+
+    def pack(self, data, command_id):
+        """
+        打包消息， 用於傳輸
+        :param data:  傳輸數據
+        :param command_id:  消息ID
+        :return: bytes
+        """
+        data = self.encode_ins.encode(data)
+        # data = "%s" % data
+        length = data.__len__() + self.head_len
+        print("aaaaaa:", length)
+        head = struct.pack(self.handfrt, length, command_id, self.version)
+        return head + data
+
+    async def send_message(self, command_id, message):
+        data = self.pack(message, command_id)
+        print("heeeeeere:", data, type(data))
+        self.transport.write(data)
 
     def connection_made(self, transport):
+        self.transport = transport
         address = transport.get_extra_info('peername')
         self.host, self.port = address
-        RpcConnectionManager().store_connection(*address, transport)
+        RpcConnectionManager().store_connection(*address, self)
         logger.debug(
             'connected to {} port {}'.format(*address)
         )
@@ -28,9 +62,8 @@ class RpcPushProtocol(asyncio.Protocol):
 
     def eof_received(self):
         logger.debug('received EOF')
-        transport = RpcConnectionManager().get_transport(self.host, self.port)
-        if transport and transport.can_write_eof():
-            transport.write_eof()
+        if self.transport and self.transport.can_write_eof():
+            self.transport.write_eof()
         RpcConnectionManager().lost_connection(self.host, self.port)
 
     def connnection_lost(self, exc):

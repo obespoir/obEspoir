@@ -44,7 +44,7 @@ level_dict = {
 }
 
 
-class KkLog(object):
+class ObLog(object):
 
     def __init__(self):
         self._normal = None
@@ -152,4 +152,4 @@ class KkLog(object):
             self.error_log._log(FATAL, msg, args, **kwargs)
 
 
-logger = KkLog()
+logger = ObLog()

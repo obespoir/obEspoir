@@ -24,6 +24,8 @@ class GlobalObject(object, metaclass=Singleton):
         self.ws_timeout = 300
         self.ws_route = {}
 
+        self.loop = None
+
     def init_from_config(self, config={}):
         """
 

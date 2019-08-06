@@ -22,7 +22,7 @@ class ObService(object):
         """Add a target to the service."""
         self._lock.acquire()
         try:
-            key = target.__name__
+            key = int((target.__name__).split('_')[-1])
             if key in self._targets.keys():
                 exist_target = self._targets.get(key)
                 raise "target [%d] Already exists,\
@@ -35,8 +35,8 @@ class ObService(object):
         """Remove a target from the service."""
         self._lock.acquire()
         try:
-            key = target.__name__
-            if key in self._targets.keys():
+            key = int((target.__name__).split('_')[-1])
+            if key in self._targets:
                 del self._targets[key]
         finally:
             self._lock.release()
@@ -65,14 +65,13 @@ class ObService(object):
         @param data: client data
         '''
         target = self.get_target(targetKey)
-
         self._lock.acquire()
         try:
             if not target:
-                logger.err('the command ' + str(targetKey) + ' not Found on service')
+                logger.error('the command ' + str(targetKey) + ' not Found on service')
                 return None
 
-            result = await target(*args, **kw)
+            result = await target(targetKey, *args, **kw)
 
             return result
         finally:
@@ -88,4 +87,5 @@ def RpcServiceHandle(target):
 
 
 def WebSocketServiceHandle(target):
+    print("xxxxxxxx:", target)
     websocket_service.map_target(target)

@@ -12,7 +12,6 @@ class Singleton(type):
         self.instance = None
         print("init")
 
-
     def __call__(self, *args, **kwargs):
         print("call:", self.instance, id(self.instance))
         if self.instance is None:

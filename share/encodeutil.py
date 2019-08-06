@@ -20,11 +20,13 @@ class AesEncoder(object, metaclass=Singleton):
     NONE_TYPE = 0
     AES_TYPE = 1
 
-    def __init__(self, password='helloworldiloveyou~1234567890123', encode_type=1):
+    def __init__(self, password='helloworldiloveyou~1234567890123', encode_type=0):
         self.aes_obj = AES.new(password)
         self.encode_type = encode_type
 
     def encode(self, msg):
+        if isinstance(msg, str):
+            msg = bytes(msg, encoding="utf8")
         if self.encode_type == self.NONE_TYPE:
             return msg
         elif self.encode_type == self.AES_TYPE:
@@ -51,6 +53,9 @@ class AesEncoder(object, metaclass=Singleton):
         return decode_msg
 
     def decode(self, msg):
+        print("cccccc:", self.encode_type, self.NONE_TYPE)
+        if isinstance(msg, str):
+            msg = bytes(msg, encoding="utf8")
         if self.encode_type == self.NONE_TYPE:
             return msg
         elif self.encode_type == self.AES_TYPE:
