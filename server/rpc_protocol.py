@@ -5,13 +5,12 @@ author = jamon
 
 import asyncio
 import struct
-import traceback
-import ujson
 
 from share.ob_log import logger
 from share.encodeutil import AesEncoder
 from server.ob_protocol import ObProtocol, DataException
 from server.ob_service import rpc_service
+from server.rpc_connection_manager import RpcConnectionManager
 from server.global_object import GlobalObject
 
 
@@ -57,12 +56,11 @@ class RpcProtocol(ObProtocol):
             self._head = struct.unpack(self.handfrt, self._buffer[:self.head_len])  # 包头
             self._buffer = self._buffer[self.head_len:]
         content_len = self._head[0] - self.head_len
-        print("here22222:", content_len, len(self._buffer))
+        print("here22222:", content_len, len(self._buffer), self._head)
         if len(self._buffer) >= content_len:
             data = self.encode_ins.decode(self._buffer[:content_len])  # 解密
             if not data:
                 raise DataException()
-            print("dadaaaaaaa")
             asyncio.ensure_future(self.message_handle(self._head[1], self._head[2], data), loop=GlobalObject().loop)
 
             _buffer = self._buffer[content_len:]
@@ -80,7 +78,9 @@ class RpcProtocol(ObProtocol):
         """
         print("message_handle:", command_id, data)
         result = await rpc_service.call_target(command_id, data)
-        self.transport.write(self.pack(result, command_id))
+        print("result=", result)
+        await RpcConnectionManager().send_message(command_id=command_id, data=self.pack(result, command_id))
+        # self.transport.write(self.pack(result, command_id))
 
     def connection_made(self, transport):
         self.transport = transport
@@ -88,7 +88,7 @@ class RpcProtocol(ObProtocol):
         logger.debug('connection accepted')
 
     def data_received(self, data):
-        logger.debug('received {!r}'.format(data))
+        logger.debug('rpc received {!r}'.format(data))
         while data:     # 解决TCP粘包问题
             data = self.process_data(data)
             # data = asyncio.run(self.process_data(data))

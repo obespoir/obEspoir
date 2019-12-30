@@ -38,3 +38,17 @@ class A(metaclass=Singleton):
 A().name = {"daab": 12}
 
 print(id(A()), id(A.get_instance()), id(A.get_instance().name), id(A().name), A().get_instance().name, A().name)
+
+async def tt():
+    return await [12,3]
+
+async def tt2():
+    return [12,3]
+
+from asyncio.coroutines import iscoroutine
+
+
+print(type(tt()), type(tt2()), type(10))
+# if isinstance(tt(), coroutine):
+if iscoroutine(tt()):
+    print("adalfjalkfjkaf")

@@ -4,13 +4,6 @@ author = jamon
 """
 
 import asyncio
-import struct
-import traceback
-import ujson
-
-from share.ob_log import logger
-from share.encodeutil import AesEncoder
-from server.ob_service import rpc_service
 
 
 class DataException(Exception):

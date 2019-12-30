@@ -10,7 +10,6 @@ from share.singleton import Singleton
 
 
 class RpcConnectionManager(object, metaclass=Singleton):
-    # __metaclass__ = Singleton
 
     def __init__(self):
         self.conns = {}     # {conn_name: {status: int(0:未连接，1：连接中，2：连接断开), transport: transport}}

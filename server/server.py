@@ -87,14 +87,14 @@ class Server(object):
         # print([self.host, ws_port, web_port, rpc_port])
 
         GlobalObject().loop = self.loop
-        print(GlobalObject().loop, id(GlobalObject()), id(GlobalObject().loop))
+
         GlobalObject().init_from_config(config)
 
-        if ws_port and self.socket_handler:
+        if ws_port and self.socket_handler:    # websocket port start
             GlobalObject().ws_server = self.loop.run_until_complete(
                 websockets.serve(self.socket_handler, self.host, ws_port))
 
-        if web_port and self.web_handler:
+        if web_port and self.web_handler:      # web http port  start
             GlobalObject().http_server = self.loop.run_until_complete(self.start_web(web_port))
 
         if rpc_port:
@@ -154,7 +154,7 @@ class Server(object):
         # 定时rpc断线重连
         while True:
             await asyncio.sleep(5)
-            logger.info("start new schedule task~")
+            # logger.info("start new schedule task~")
             # print(RpcConnectionManager().type_dict, RpcConnectionManager().conns)
             for node_type, name_lst in RpcConnectionManager().type_dict.items():
                 for name in name_lst:
@@ -183,6 +183,7 @@ class Server(object):
             self.loop.close()
 
 
-
+    import aiohttp
+    aiohttp.TCPConnector
 
 

@@ -33,7 +33,7 @@ class RpcProtocol(object):
         打包消息， 用於傳輸
         :param data:  傳輸數據
         :param command_id:  消息ID
-        :return:
+        :return: bytes
         """
         print(type(data))
         data = self.encode_ins.encode(data)
@@ -42,7 +42,7 @@ class RpcProtocol(object):
         head = struct.pack(self.handfrt, length, command_id, self.version)
         print("type=", type(head), type(data), [head], head[0])
         print(struct.unpack(self.handfrt, head))
-        return (head + data).decode("utf8")
+        return head + data
 
 
 def test_http_web_proxy():
@@ -57,7 +57,7 @@ async def test_websocket_proxy():
     async with websockets.connect("ws://127.0.0.1:20000") as websocket:
         name = "jamon"
         print("send server: ", name)
-        data = RpcProtocol().pack(ujson.dumps({"name": name}), 0)
+        data = RpcProtocol().pack(ujson.dumps({"name": name}), 1000)
         print("data=", data)
         await websocket.send(data)
         greeting = await websocket.recv()

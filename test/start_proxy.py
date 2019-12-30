@@ -9,7 +9,6 @@ if __name__ == "__main__":
     sys.path.append("../")    # 添加项目的根目录到系统路径中
 
 import logging
-import handler.websocket_handler
 
 from handler.websocket_handler import WebsocketHandler
 from share.parse_json import ParseJson

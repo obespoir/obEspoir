@@ -39,13 +39,12 @@ class RpcPushProtocol(asyncio.Protocol):
         data = self.encode_ins.encode(data)
         # data = "%s" % data
         length = data.__len__() + self.head_len
-        print("aaaaaa:", length)
         head = struct.pack(self.handfrt, length, command_id, self.version)
         return head + data
 
     async def send_message(self, command_id, message):
         data = self.pack(message, command_id)
-        print("heeeeeere:", data, type(data))
+        print("rpc_push send_message:", data, type(data))
         self.transport.write(data)
 
     def connection_made(self, transport):
@@ -58,10 +57,10 @@ class RpcPushProtocol(asyncio.Protocol):
         )
 
     def data_received(self, data):
-        logger.debug('received {!r}'.format(data))
+        logger.debug('rpc_push received {!r}'.format(data))
 
     def eof_received(self):
-        logger.debug('received EOF')
+        logger.debug('rpc_push received EOF')
         if self.transport and self.transport.can_write_eof():
             self.transport.write_eof()
         RpcConnectionManager().lost_connection(self.host, self.port)

@@ -5,7 +5,16 @@ author = jamon
 
 import threading
 
+from asyncio.coroutines import iscoroutine
 from share.ob_log import logger
+
+
+class RpcMsgType(object):
+    """Rpc接口收到的消息类型"""
+
+    LOCAL = 1   # 需要本地处理的消息
+    TRANS = 2   # 需要转发的消息
+    WEB_SOCKET = 3  # 需要直接推送给websocket客户端的消息
 
 
 class ObService(object):
@@ -71,15 +80,32 @@ class ObService(object):
                 logger.error('the command ' + str(targetKey) + ' not Found on service')
                 return None
 
-            result = await target(targetKey, *args, **kw)
+            result = target(targetKey, *args, **kw)
 
+            if iscoroutine(result):
+                result = await result
+            print("call_target result:", result)
             return result
         finally:
             self._lock.release()
 
 
+class WebSocketService(ObService):
+
+    def get_target(self, targetKey):
+        """Get a target from the service by name."""
+        self._lock.acquire()
+        try:
+            target = self._targets.get(targetKey, None)
+            if not target:
+                target = self._targets.get(0, None)
+        finally:
+            self._lock.release()
+        return target
+
+
 rpc_service = ObService()
-websocket_service = ObService()
+websocket_service = WebSocketService()
 
 
 def RpcServiceHandle(target):
@@ -87,5 +113,4 @@ def RpcServiceHandle(target):
 
 
 def WebSocketServiceHandle(target):
-    print("xxxxxxxx:", target)
     websocket_service.map_target(target)

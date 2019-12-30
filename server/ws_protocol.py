@@ -5,7 +5,6 @@ author = jamon
 
 import struct
 
-from share.ob_log import logger
 from share.encodeutil import AesEncoder
 from server.ob_protocol import ObProtocol, DataException
 from server.ob_service import websocket_service
@@ -22,7 +21,7 @@ class WebSocketProtocol(ObProtocol):
 
         self.encode_ins = AesEncoder(GlobalObject().rpc_password, encode_type=GlobalObject().rpc_encode_type)
         self.version = 0
-        print("hhhhhh:", id(self), self.encode_ins)
+
         self._buffer = b""    # 数据缓冲buffer
         self._head = None     # 消息头, list,   [message_length, command_id, version]
         self.transport = None
@@ -41,7 +40,9 @@ class WebSocketProtocol(ObProtocol):
         return head + data
 
     async def process_data(self, data, websocket):
-        self._buffer += bytes(data, encoding='utf8')
+        if isinstance(data, str):
+            data = bytes(data, encoding='utf8')
+        self._buffer += data
         _buffer = None
         if self._head is None:
             if len(self._buffer) < self.head_len:
@@ -70,6 +71,6 @@ class WebSocketProtocol(ObProtocol):
         :return:
         """
         print("message_handle:", data)
-        result = await websocket_service.call_target(0, data)
+        result = await websocket_service.call_target(command_id, data)
         if result:
-            websocket.send(self.pack(command_id, result).decode("utf8"))
+            websocket.send(self.pack(result, command_id).decode("utf8"))

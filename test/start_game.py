@@ -8,7 +8,6 @@ if __name__ == "__main__":
     import sys
     sys.path.append("../")    # 添加项目的根目录到系统路径中
 
-import json
 import logging
 from share.ob_log import logger
 from share.parse_json import ParseJson

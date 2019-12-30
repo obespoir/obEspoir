@@ -4,6 +4,10 @@
     "log_dir": "/data/logs/obEspoir/",                           // 项目运行日志存放目录（不同测试环境目录不同）
 
     "host": "127.0.0.1",
+    "host_name": "oldboy_1",
+    "route": [          // 路由节点
+
+    ],
     "websocket": {
         "port": 20000,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 websocket通信
