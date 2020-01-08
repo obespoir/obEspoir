@@ -3,6 +3,9 @@
 author = jamon
 """
 
+import hashlib
+
+from base.common_define import NodeType
 from share.singleton import Singleton
 
 
@@ -12,6 +15,10 @@ class GlobalObject(object, metaclass=Singleton):
     """
 
     def __init__(self):
+        self.name = None
+        self.id = None
+        self.type = -1
+
         self.http_server = None           # http server
 
         self.rpc_server = None            # rpc server
@@ -32,6 +39,9 @@ class GlobalObject(object, metaclass=Singleton):
         :param config: dict
         :return:
         """
+        self.name = config["name"]
+        self.type = NodeType.get_type(config["type"])
+
         self.rpc_password = config["rpc"]["token"]
         self.rpc_encode_type = config["rpc"]["encode"]
 
@@ -41,6 +51,14 @@ class GlobalObject(object, metaclass=Singleton):
         self.ws_route = config["websocket"]["route"]
         if not self.validate_route():
             raise Exception("route config error!")
+
+        self.id = self.gen_id(config["host"], config["rpc"]["port"])
+
+    @staticmethod
+    def gen_id(host, port):
+        c_md5 = hashlib.md5()
+        c_md5.update("{}_{}".format(host, port).encode("utf-8"))
+        return c_md5.hexdigest()
 
     def validate_route(self):
         """

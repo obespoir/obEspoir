@@ -30,21 +30,21 @@ class ObProtocol(asyncio.Protocol):
         :param command_id:  消息ID
         :return:
         """
-        pass
+        raise NotImplementedError
 
     def process_data(self, data):
-        pass
+        raise NotImplementedError
 
     def connection_made(self, transport):
-        pass
+        raise NotImplementedError
 
     def data_received(self, data):
-        pass
+        raise NotImplementedError
 
     def eof_received(self):
-        pass
+        raise NotImplementedError
 
     def connection_lost(self, error):
-        pass
+        raise NotImplementedError
 
 

@@ -17,7 +17,7 @@ class RpcMsgType(object):
     WEB_SOCKET = 3  # 需要直接推送给websocket客户端的消息
 
 
-class ObService(object):
+class ObRoute(object):
     """消息分发"""
 
     def __init__(self):
@@ -90,27 +90,9 @@ class ObService(object):
             self._lock.release()
 
 
-class WebSocketService(ObService):
-
-    def get_target(self, targetKey):
-        """Get a target from the service by name."""
-        self._lock.acquire()
-        try:
-            target = self._targets.get(targetKey, None)
-            if not target:
-                target = self._targets.get(0, None)
-        finally:
-            self._lock.release()
-        return target
 
 
-rpc_service = ObService()
-websocket_service = WebSocketService()
 
 
-def RpcServiceHandle(target):
-    rpc_service.map_target(target)
 
 
-def WebSocketServiceHandle(target):
-    websocket_service.map_target(target)

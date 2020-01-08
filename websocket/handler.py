@@ -10,11 +10,13 @@ from websockets.exceptions import ConnectionClosed
 
 from share.singleton import Singleton
 from share.ob_log import logger
-from server.ob_protocol import DataException
-from server.ob_service import WebSocketServiceHandle
-from server.global_object import GlobalObject
-from server.ws_protocol import WebSocketProtocol
-from server.remote_service import send_message
+from base.common_define import NodeType
+from base.ob_protocol import DataException
+from base.global_object import GlobalObject
+from websocket.protocol import WebSocketProtocol
+from websocket.route import webSocketRouteHandle
+from websocket.manager import WebsocketConnectionManager
+from rpc.push_lib import send_message
 
 
 class WebsocketHandler(object, metaclass=Singleton):
@@ -42,7 +44,7 @@ class WebsocketHandler(object, metaclass=Singleton):
                 return 0
 
 
-@WebSocketServiceHandle
+@webSocketRouteHandle
 async def forward_0(command_id, data):
     """
     消息转发
@@ -70,7 +72,7 @@ async def forward_0(command_id, data):
             if next_node:
                 break
             for r in route:
-                if command_id >= r[0] and command_id<=r[1]:
+                if r[0] <= command_id <= r[1]:
                     next_node = node
                     break
     print("next_node:", next_node)
@@ -78,5 +80,7 @@ async def forward_0(command_id, data):
         logger.info("can not find route node for message {}".format(command_id))
         return {}
     else:
-        return await send_message(next_node, command_id, data)
+        src = GlobalObject().id
+        next_node = NodeType.get_type(next_node)
+        return await send_message(next_node, command_id, data, src=src, to=None)
 

@@ -1,26 +1,25 @@
 {
     "log_level": "debug",                                        // 日志级别
-    "service_name": "proxy",                                     // 项目名称
+    "name": "proxy_1",                                           // 节点名称
     "log_dir": "/data/logs/obEspoir/",                           // 项目运行日志存放目录（不同测试环境目录不同）
 
     "host": "127.0.0.1",
-    "host_name": "oldboy_1",
-    "route": [          // 路由节点
-
+    "type": "proxy",
+    "route": [              // 路由节点
+        {
+            "host": "127.0.0.1",
+            "port":  21002,
+            "token": "helloworldiloveyou~1234567890123",
+            "encode": 0,
+            "type": "game"                      // 节点类型(字符串标识)
+        }
     ],
     "websocket": {
         "port": 20000,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 websocket通信
         "encode": 0,                                      // 是否启用加密
         "timeout": 300,                                   //多久连接超时（单位为秒）
-        "route": {                                        //配置消息分发的路由
-            "range": {
-                "game": [[0, 100000]]
-            },
-            "special": {
-                            // like "game": [110119]
-            }
-        }
+
     },
     "http": {
         "port": 20001,
@@ -31,7 +30,15 @@
         "port": 20002,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 rpc通信
         "encode": 0,                                      // 是否启用加密
-        "type": "proxy"                                   // 节点类型
+        "type": "proxy",                                   // 节点类型
+        "route": {                                        //配置消息分发的路由
+            "range": {
+                "game": [[0, 100000]]
+            },
+            "special": {
+                            // like "game": [110119]
+            }
+        }
     },
 
     "remote_ports": [
@@ -40,7 +47,7 @@
             "port":  21002,
             "token": "helloworldiloveyou~1234567890123",
             "encode": 0,
-            "type": "game"                      // 节点类型(字符串标识)
+            "type": "route"                      // 节点类型(字符串标识)
         }
     ]
 

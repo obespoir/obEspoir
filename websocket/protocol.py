@@ -4,15 +4,30 @@ author = jamon
 """
 
 import struct
+import threading
+from websockets.server import WebSocketServerProtocol
 
 from share.encodeutil import AesEncoder
-from server.ob_protocol import ObProtocol, DataException
-from server.ob_service import websocket_service
-from server.global_object import GlobalObject
+from base.ob_protocol import DataException
+from base.global_object import GlobalObject
+from websocket.route import websocket_route
+from websocket.manager import WebsocketConnectionManager
 
 
-class WebSocketProtocol(ObProtocol):
+class WebSocketProtocol(WebSocketServerProtocol):
     """消息协议，包含消息处理"""
+
+    cur_seq = 0
+    lock = threading.RLock()
+
+    @classmethod
+    def gen_new_seq(cls):
+        cls.lock.acquire()
+        try:
+            cls.cur_seq += 1
+            return cls.cur_seq
+        finally:
+            cls.lock.release()
 
     def __init__(self):
         self.handfrt = "iii"  # (int, int, int)  -> (message_length, command_id, version)
@@ -26,6 +41,18 @@ class WebSocketProtocol(ObProtocol):
         self._head = None     # 消息头, list,   [message_length, command_id, version]
         self.transport = None
         super().__init__()
+
+    def connection_open(self):
+        super().connection_open()
+        WebsocketConnectionManager().store_connection(WebSocketProtocol.gen_new_seq(), self)
+
+    def connection_made(self, transport):
+        super().connection_made(transport)
+        self.transport = transport
+
+    def connection_lost(self, exc):
+        super().connection_lost(exc)
+        WebsocketConnectionManager().remove_connection(self)
 
     def pack(self, data, command_id):
         """
@@ -71,6 +98,6 @@ class WebSocketProtocol(ObProtocol):
         :return:
         """
         print("message_handle:", data)
-        result = await websocket_service.call_target(command_id, data)
+        result = await websocket_route.call_target(command_id, data)
         if result:
             websocket.send(self.pack(result, command_id).decode("utf8"))

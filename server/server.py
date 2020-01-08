@@ -8,10 +8,13 @@ import asyncio
 import websockets
 
 from aiohttp import web
-from server.rpc_protocol import RpcProtocol
-from server.rpc_push import RpcPushProtocol
-from server.rpc_connection_manager import RpcConnectionManager
-from server.global_object import GlobalObject
+
+from base.common_define import NodeType, ConnectionStatus
+from rpc.protocol import RpcProtocol
+from rpc.push_protocol import RpcPushProtocol
+from rpc.connection_manager import RpcConnectionManager
+from websocket.protocol import WebSocketProtocol
+from base.global_object import GlobalObject
 from share.ob_log import logger
 
 
@@ -92,7 +95,7 @@ class Server(object):
 
         if ws_port and self.socket_handler:    # websocket port start
             GlobalObject().ws_server = self.loop.run_until_complete(
-                websockets.serve(self.socket_handler, self.host, ws_port))
+                websockets.serve(self.socket_handler, self.host, ws_port,create_protocol=WebSocketProtocol))
 
         if web_port and self.web_handler:      # web http port  start
             GlobalObject().http_server = self.loop.run_until_complete(self.start_web(web_port))
@@ -105,7 +108,7 @@ class Server(object):
             for rp in remote_ports:
                 host = rp.get("host", "")
                 port = rp.get("port", 0)
-                s_type = rp.get('type')
+                s_type = NodeType.get_type(rp.get('type'))
                 if host and port:
                     remote_serv = self.loop.create_connection(RpcPushProtocol, host=host, port=port)
                     RpcConnectionManager().add_type_node(s_type, host, port)
@@ -126,12 +129,13 @@ class Server(object):
         remote_names = ["{}_{}".format(k, v) for k, v in addr_info.items()]
         for r in RpcConnectionManager().conns.keys():
             if r not in remote_names:
-                if RpcConnectionManager().conns[r]["status"] == 1:
+                if RpcConnectionManager().conns[r]["status"] == ConnectionStatus.ESTABLISHED:
                     RpcConnectionManager().conns[r]["conn"].transport.close()
                 RpcConnectionManager().conns.pop(r)
         for k, v in addr_info.items():
             name = "{}_{}".format(k, v)
-            if name not in RpcConnectionManager().conns.keys() or RpcConnectionManager().conns[name]["status"] != 1:
+            if name not in RpcConnectionManager().conns.keys() \
+                    or RpcConnectionManager().conns[name]["status"] != ConnectionStatus.ESTABLISHED:
                 RpcConnectionManager().add_type_node(server_type, k, v)
                 try:
                     await self.loop.create_connection(RpcPushProtocol, host=k, port=v)
@@ -159,7 +163,7 @@ class Server(object):
             for node_type, name_lst in RpcConnectionManager().type_dict.items():
                 for name in name_lst:
                     if name not in RpcConnectionManager().conns.keys()\
-                            or 1!=RpcConnectionManager().conns[name]["status"]:
+                            or ConnectionStatus.ESTABLISHED != RpcConnectionManager().conns[name]["status"]:
                         host, port = name.split("_")
                         try:
                             await self.loop.create_connection(RpcPushProtocol, host=host, port=port)
@@ -183,7 +187,5 @@ class Server(object):
             self.loop.close()
 
 
-    import aiohttp
-    aiohttp.TCPConnector
 
 

@@ -5,13 +5,14 @@ author = jamon
 
 import asyncio
 import struct
+import ujson
 
 from share.ob_log import logger
 from share.encodeutil import AesEncoder
-from server.ob_protocol import ObProtocol, DataException
-from server.ob_service import rpc_service
-from server.rpc_connection_manager import RpcConnectionManager
-from server.global_object import GlobalObject
+from base.ob_protocol import ObProtocol, DataException
+from rpc.route import rpc_route
+# from rpc.connection_manager import RpcConnectionManager
+from base.global_object import GlobalObject
 
 
 class RpcProtocol(ObProtocol):
@@ -30,17 +31,17 @@ class RpcProtocol(ObProtocol):
         self.transport = None
         super().__init__()
 
-    def pack(self, data, command_id):
+    def pack(self, data, command_id, src=None, to=None):
         """
         打包消息， 用於傳輸
         :param data:  傳輸數據
         :param command_id:  消息ID
         :return: bytes
         """
-        data = self.encode_ins.encode(data)
+        info = {"src": src, "to": to, "data": data}
+        data = self.encode_ins.encode(ujson.dumps(data))
         # data = "%s" % data
         length = data.__len__() + self.head_len
-        print("aaaaaa:", length)
         head = struct.pack(self.handfrt, length, command_id, self.version)
         return head + data
 
@@ -77,9 +78,10 @@ class RpcProtocol(ObProtocol):
         :return:
         """
         print("message_handle:", command_id, data)
-        result = await rpc_service.call_target(command_id, data)
+        result = await rpc_route.call_target(command_id, data)
         print("result=", result)
-        await RpcConnectionManager().send_message(command_id=command_id, data=self.pack(result, command_id))
+        self.transport.write(self.pack(result, command_id))
+        # await RpcConnectionManager().send_message(command_id=command_id, data=self.pack(result, command_id))
         # self.transport.write(self.pack(result, command_id))
 
     def connection_made(self, transport):

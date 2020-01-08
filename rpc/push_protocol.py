@@ -4,10 +4,11 @@ author = jamon
 """
 
 import asyncio
+import ujson
 import struct
 
-from server.global_object import GlobalObject
-from server.rpc_connection_manager import RpcConnectionManager
+from base.global_object import GlobalObject
+from rpc.connection_manager import RpcConnectionManager
 from share.encodeutil import AesEncoder
 from share.ob_log import logger
 
@@ -29,21 +30,22 @@ class RpcPushProtocol(asyncio.Protocol):
         self.transport = None
         super().__init__()
 
-    def pack(self, data, command_id):
+    def pack(self, data, command_id, src=None, to=None):
         """
         打包消息， 用於傳輸
         :param data:  傳輸數據
         :param command_id:  消息ID
         :return: bytes
         """
-        data = self.encode_ins.encode(data)
+        info = {"src": src, "to": to, "data": data}
+        data = self.encode_ins.encode(ujson.dumps(data))
         # data = "%s" % data
         length = data.__len__() + self.head_len
         head = struct.pack(self.handfrt, length, command_id, self.version)
         return head + data
 
-    async def send_message(self, command_id, message):
-        data = self.pack(message, command_id)
+    async def send_message(self, command_id, message, src, to=None):
+        data = self.pack(message, command_id, src, to)
         print("rpc_push send_message:", data, type(data))
         self.transport.write(data)
 
@@ -68,6 +70,6 @@ class RpcPushProtocol(asyncio.Protocol):
     def connnection_lost(self, exc):
         logger.debug('server closed connection')
         RpcConnectionManager().lost_connection(self.host, self.port)
-        super().connectiong_lost(exc)
+        super(RpcPushProtocol, self).connection_lost(exc)
 
 
