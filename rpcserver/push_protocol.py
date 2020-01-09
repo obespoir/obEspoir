@@ -8,7 +8,7 @@ import ujson
 import struct
 
 from base.global_object import GlobalObject
-from rpc.connection_manager import RpcConnectionManager
+from rpcserver.connection_manager import RpcConnectionManager
 from share.encodeutil import AesEncoder
 from share.ob_log import logger
 
@@ -30,22 +30,22 @@ class RpcPushProtocol(asyncio.Protocol):
         self.transport = None
         super().__init__()
 
-    def pack(self, data, command_id, src=None, to=None):
+    def pack(self, data, command_id, session_id=None, to=None):
         """
         打包消息， 用於傳輸
         :param data:  傳輸數據
         :param command_id:  消息ID
         :return: bytes
         """
-        info = {"src": src, "to": to, "data": data}
+        info = {"src": session_id, "to": to, "data": data}
         data = self.encode_ins.encode(ujson.dumps(data))
         # data = "%s" % data
         length = data.__len__() + self.head_len
         head = struct.pack(self.handfrt, length, command_id, self.version)
         return head + data
 
-    async def send_message(self, command_id, message, src, to=None):
-        data = self.pack(message, command_id, src, to)
+    async def send_message(self, command_id, message, session_id, to=None):
+        data = self.pack(message, command_id, session_id, to)
         print("rpc_push send_message:", data, type(data))
         self.transport.write(data)
 

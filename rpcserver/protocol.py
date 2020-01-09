@@ -10,8 +10,7 @@ import ujson
 from share.ob_log import logger
 from share.encodeutil import AesEncoder
 from base.ob_protocol import ObProtocol, DataException
-from rpc.route import rpc_route
-# from rpc.connection_manager import RpcConnectionManager
+from rpcserver.route import rpc_message_handle
 from base.global_object import GlobalObject
 
 
@@ -31,14 +30,14 @@ class RpcProtocol(ObProtocol):
         self.transport = None
         super().__init__()
 
-    def pack(self, data, command_id, src=None, to=None):
+    def pack(self, data, command_id, session_id=None, to=None):
         """
         打包消息， 用於傳輸
         :param data:  傳輸數據
         :param command_id:  消息ID
         :return: bytes
         """
-        info = {"src": src, "to": to, "data": data}
+        info = {"src": session_id, "to": to, "data": data}
         data = self.encode_ins.encode(ujson.dumps(data))
         # data = "%s" % data
         length = data.__len__() + self.head_len
@@ -78,7 +77,8 @@ class RpcProtocol(ObProtocol):
         :return:
         """
         print("message_handle:", command_id, data)
-        result = await rpc_route.call_target(command_id, data)
+        # result = await rpc_route.call_target(command_id, data)
+        result = await rpc_message_handle(command_id, data)
         print("result=", result)
         self.transport.write(self.pack(result, command_id))
         # await RpcConnectionManager().send_message(command_id=command_id, data=self.pack(result, command_id))
@@ -90,7 +90,7 @@ class RpcProtocol(ObProtocol):
         logger.debug('connection accepted')
 
     def data_received(self, data):
-        logger.debug('rpc received {!r}'.format(data))
+        logger.debug('rpcserver received {!r}'.format(data))
         while data:     # 解决TCP粘包问题
             data = self.process_data(data)
             # data = asyncio.run(self.process_data(data))

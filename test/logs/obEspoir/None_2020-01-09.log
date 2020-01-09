@@ -1,0 +1,12 @@
+[2020-01-09 15:50:31,325]-INFO    <root> {server.py:120} -> connect to 127.0.0.1:21002 failed!
+[2020-01-09 15:50:34,921]-ERROR   <asyncio> {(unknown file):0} -> Task was destroyed but it is pending!
+task: <Task pending coro=<Server.schedule() done, defined at /Users/jamon/data/source/obEspoir/server/server.py:157> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x109317eb8>()]> cb=[_chain_future.<locals>._call_set_state() at /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/lib/python3.7/asyncio/futures.py:355]>
+[2020-01-09 16:40:55,036]-INFO    <root> {server.py:120} -> connect to 127.0.0.1:21002 failed!
+[2020-01-09 16:40:56,070]-ERROR   <asyncio> {(unknown file):0} -> Task was destroyed but it is pending!
+task: <Task pending coro=<Server.schedule() done, defined at /Users/jamon/data/source/obEspoir/server/server.py:157> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x101d92eb8>()]> cb=[_chain_future.<locals>._call_set_state() at /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/lib/python3.7/asyncio/futures.py:355]>
+[2020-01-09 16:54:50,294]-INFO    <root> {server.py:120} -> connect to 127.0.0.1:21002 failed!
+[2020-01-09 16:54:51,861]-ERROR   <asyncio> {(unknown file):0} -> Task was destroyed but it is pending!
+task: <Task pending coro=<Server.schedule() done, defined at /Users/jamon/data/source/obEspoir/server/server.py:157> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x10f5d9df8>()]> cb=[_chain_future.<locals>._call_set_state() at /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/lib/python3.7/asyncio/futures.py:355]>
+[2020-01-09 17:02:11,687]-INFO    <root> {server.py:120} -> connect to 127.0.0.1:20002 failed!
+[2020-01-09 17:02:13,729]-ERROR   <asyncio> {(unknown file):0} -> Task was destroyed but it is pending!
+task: <Task pending coro=<Server.schedule() done, defined at /Users/jamon/data/source/obEspoir/server/server.py:157> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x10167dbe8>()]> cb=[_chain_future.<locals>._call_set_state() at /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/lib/python3.7/asyncio/futures.py:355]>

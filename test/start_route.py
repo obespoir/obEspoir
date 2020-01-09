@@ -16,12 +16,10 @@ from server.server import Server
 
 if __name__ == "__main__":
     main_server = Server()
-    serv_config = ParseJson.loads("../game_config.json")
+    serv_config = ParseJson.loads("route_config.json")
 
     logger.init(module_name=serv_config.get("service_name"),log_dir=serv_config.get("log_dir", "../logs/")
                 , level=serv_config.get("log_level", logging.DEBUG))
 
-    # main_server.config(serv_config)
-    # main_server.run()
     main_server.start(serv_config)
 

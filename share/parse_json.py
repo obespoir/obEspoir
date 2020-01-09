@@ -73,7 +73,6 @@ class ParseJson(object):
                 xline = TrimNote(line)
                 dstJsonStr += xline.rmCmt()
 
-        dstJson = {}
         try:
             dstJson = json.loads(dstJsonStr)
             return dstJson

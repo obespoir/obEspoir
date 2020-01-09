@@ -10,10 +10,10 @@ import websockets
 from aiohttp import web
 
 from base.common_define import NodeType, ConnectionStatus
-from rpc.protocol import RpcProtocol
-from rpc.push_protocol import RpcPushProtocol
-from rpc.connection_manager import RpcConnectionManager
-from websocket.protocol import WebSocketProtocol
+from rpcserver.protocol import RpcProtocol
+from rpcserver.push_protocol import RpcPushProtocol
+from rpcserver.connection_manager import RpcConnectionManager
+from websocketserver.protocol import WebSocketProtocol
 from base.global_object import GlobalObject
 from share.ob_log import logger
 
@@ -72,7 +72,7 @@ class Server(object):
         runner = web.AppRunner(app)
         await runner.setup()
         site = web.TCPSite(runner, self.host, web_port)
-        logger.info('server started at http://{0}:{1}...'.format(self.host, web_port))
+        logger.info('server started at httpserver://{0}:{1}...'.format(self.host, web_port))
         await site.start()
 
     def config(self, config):
@@ -83,9 +83,9 @@ class Server(object):
         """
         host = config.get("host")
         self.host = host
-        ws_port = config["websocket"].get("port", 0)      # web_socket port
-        web_port = config["http"].get("port", 0)    # web http port
-        rpc_port = config["rpc"].get("port", 0)    # rpc port
+        ws_port = config.get("websocket", {}).get("port", 0)      # web_socket port
+        web_port = config.get("http", {}).get("port", 0)    # web httpserver port
+        rpc_port = config.get("rpc", {}).get("port", 0)    # rpcserver port
         remote_ports = config.get("remote_ports", [])   # remote_ports list
         # print([self.host, ws_port, web_port, rpc_port])
 
@@ -93,11 +93,11 @@ class Server(object):
 
         GlobalObject().init_from_config(config)
 
-        if ws_port and self.socket_handler:    # websocket port start
+        if ws_port and self.socket_handler:    # websocketserver port start
             GlobalObject().ws_server = self.loop.run_until_complete(
                 websockets.serve(self.socket_handler, self.host, ws_port,create_protocol=WebSocketProtocol))
 
-        if web_port and self.web_handler:      # web http port  start
+        if web_port and self.web_handler:      # web httpserver port  start
             GlobalObject().http_server = self.loop.run_until_complete(self.start_web(web_port))
 
         if rpc_port:

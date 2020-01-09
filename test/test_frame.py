@@ -62,7 +62,7 @@ async def test_websocket_proxy():
         await websocket.send(data)
         greeting = await websocket.recv()
         print("receive from server: ", greeting)
-        # ret = await websocket.close(reason="user exit")
+        # ret = await websocketserver.close(reason="user exit")
         ret = await asyncio.sleep(10)
         print("t::::::", ret)
 

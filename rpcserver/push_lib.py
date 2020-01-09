@@ -8,11 +8,12 @@ import random
 
 from base.common_define import NodeType, ConnectionStatus
 from base.global_object import GlobalObject
-from rpc.connection_manager import RpcConnectionManager
+from rpcserver.connection_manager import RpcConnectionManager
+from rpcserver.session_cache import SessionCache
 from share.ob_log import logger
 
 
-async def call_remote_service(node_name, command_id, message, src=None, to=None):
+async def call_remote_service(node_name, command_id, message, session_id=None, to=None):
     """
 
     :param node_name: string, 节点名
@@ -22,7 +23,7 @@ async def call_remote_service(node_name, command_id, message, src=None, to=None)
     :param to: string, 消息最终发往哪里，为空时则根据消息ID发送
     :return:
     """
-    return await RpcConnectionManager().send_message(node_name, command_id, message, src=src, to=to)
+    return await RpcConnectionManager().send_message(node_name, command_id, message, session_id=session_id , to=to)
 
 
 async def find_available_node(next_node_type, to=None):
@@ -53,7 +54,7 @@ async def find_available_node(next_node_type, to=None):
         return next_node
 
 
-async def send_message(next_node_type, command_id, message, src=None, to=None):
+async def send_message(next_node_type, command_id, message, session_id=None, to=None):
     """
     向其他节点推送消息
     :param next_node_type: int, 接下来发往的节点类型
@@ -65,9 +66,11 @@ async def send_message(next_node_type, command_id, message, src=None, to=None):
     """
     if next_node_type == GlobalObject().type:
         # 参数错误，自己给自己发消息
-        logger.error("send_message:", next_node_type, command_id, message, src, to)
+        logger.error("send_message:", next_node_type, command_id, message, session_id, to)
         raise Exception()
 
-    next_node = await find_available_node(next_node_type, to=to)
+    next_node = SessionCache().get_node(session_id, next_node_type)
+    if not next_node:
+        next_node = await find_available_node(next_node_type, to=to)
     print("send_message:", next_node)
-    await call_remote_service(next_node, command_id, message, src=src, to=to)
+    await call_remote_service(next_node, command_id, message, session_id=session_id , to=to)

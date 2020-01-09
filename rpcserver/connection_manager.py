@@ -3,6 +3,7 @@
 author = jamon
 """
 
+import asyncio
 import random
 import ujson
 
@@ -75,7 +76,7 @@ class RpcConnectionManager(object, metaclass=Singleton):
             if name in self.type_dict[node_type]:
                 self.type_dict[node_type].remove(name)
 
-    async def send_message(self, node_name, command_id, data, src=None, to=None):
+    async def send_message(self, node_name, command_id, data, session_id=None, to=None):
         """
         向指定连接发送消息
         :param node_name: string
@@ -83,14 +84,25 @@ class RpcConnectionManager(object, metaclass=Singleton):
         :param message:
         :return:
         """
-        if node_name not in self.conns.keys() or ConnectionStatus.ESTABLISHED != self.conns[node_name]["status"]:
+        if node_name not in self.conns.keys():
             print("sssssssss:", self.conns)
             logger.warn("can not find connection {}".format(node_name))
             return
 
+        if ConnectionStatus.ESTABLISHED != self.conns[node_name]["status"]:
+            # 连接断开状态
+            logger.warn("connection is unavailable {}".format(node_name))
+            for reconnect_times in range(3):
+                await asyncio.sleep(5)
+                if ConnectionStatus.ESTABLISHED == self.conns[node_name]["status"]:
+                    break
+                if 2 == reconnect_times:
+                    logger.error("exceed max reconnect times {}".format(node_name))
+                    return
+
         if not isinstance(data, str):
             data = ujson.dumps(data)
         print(data, data.encode("utf8"), type(data))
-        await self.conns[node_name]["conn"].send_message(command_id, data, src=src, to=to)
-        logger.debug("rpc send {0}".format(data))
+        await self.conns[node_name]["conn"].send_message(command_id, data, session_id=session_id , to=to)
+        logger.debug("rpcserver send {0}".format(data))
         return 1

@@ -10,8 +10,8 @@ from websockets.server import WebSocketServerProtocol
 from share.encodeutil import AesEncoder
 from base.ob_protocol import DataException
 from base.global_object import GlobalObject
-from websocket.route import websocket_route
-from websocket.manager import WebsocketConnectionManager
+from websocketserver.route import websocket_route
+from websocketserver.manager import WebsocketConnectionManager
 
 
 class WebSocketProtocol(WebSocketServerProtocol):
@@ -32,7 +32,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
     def __init__(self):
         self.handfrt = "iii"  # (int, int, int)  -> (message_length, command_id, version)
         self.head_len = struct.calcsize(self.handfrt)
-        self.identifier = 0
+        self.session_id = ""
 
         self.encode_ins = AesEncoder(GlobalObject().rpc_password, encode_type=GlobalObject().rpc_encode_type)
         self.version = 0
@@ -44,7 +44,9 @@ class WebSocketProtocol(WebSocketServerProtocol):
 
     def connection_open(self):
         super().connection_open()
-        WebsocketConnectionManager().store_connection(WebSocketProtocol.gen_new_seq(), self)
+        seq = WebSocketProtocol.gen_new_seq()
+        self.session_id = "{}_{}".format(GlobalObject().id, seq)
+        WebsocketConnectionManager().store_connection(seq, self)
 
     def connection_made(self, transport):
         super().connection_made(transport)
@@ -53,6 +55,10 @@ class WebSocketProtocol(WebSocketServerProtocol):
     def connection_lost(self, exc):
         super().connection_lost(exc)
         WebsocketConnectionManager().remove_connection(self)
+
+    def send_message(self, result, command_id):
+        data = self.pack(result, command_id).decode("utf8")
+        self.send(data)
 
     def pack(self, data, command_id):
         """
@@ -98,6 +104,6 @@ class WebSocketProtocol(WebSocketServerProtocol):
         :return:
         """
         print("message_handle:", data)
-        result = await websocket_route.call_target(command_id, data)
+        result = await websocket_route.call_target(command_id, data, session_id=websocket.seq)
         if result:
             websocket.send(self.pack(result, command_id).decode("utf8"))
