@@ -4,6 +4,9 @@ author = jamon
 """
 
 
+CLIENT_OFFLINE = 999   # 连接断开
+
+
 class NodeType(object):
     PROXY = 0        # 代理节点
     ROUTE = 1        # 路由节点

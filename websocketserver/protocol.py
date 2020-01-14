@@ -3,13 +3,16 @@
 author = jamon
 """
 
+import asyncio
 import struct
 import threading
 from websockets.server import WebSocketServerProtocol
 
-from share.encodeutil import AesEncoder
-from base.ob_protocol import DataException
+from base.common_define import CLIENT_OFFLINE
 from base.global_object import GlobalObject
+from base.ob_protocol import DataException
+from rpcserver.session_cache import SessionCache
+from share.encodeutil import AesEncoder
 from websocketserver.route import websocket_route
 from websocketserver.manager import WebsocketConnectionManager
 
@@ -29,9 +32,12 @@ class WebSocketProtocol(WebSocketServerProtocol):
         finally:
             cls.lock.release()
 
-    def __init__(self):
+    def __init__(self, ws_handler, ws_server, *,
+                 origins=None, extensions=None, subprotocols=None,
+                 extra_headers=None, **kwds):
         self.handfrt = "iii"  # (int, int, int)  -> (message_length, command_id, version)
         self.head_len = struct.calcsize(self.handfrt)
+        self.seq = None
         self.session_id = ""
 
         self.encode_ins = AesEncoder(GlobalObject().rpc_password, encode_type=GlobalObject().rpc_encode_type)
@@ -40,13 +46,13 @@ class WebSocketProtocol(WebSocketServerProtocol):
         self._buffer = b""    # 数据缓冲buffer
         self._head = None     # 消息头, list,   [message_length, command_id, version]
         self.transport = None
-        super().__init__()
+        super().__init__(ws_handler, ws_server, **kwds)
 
     def connection_open(self):
         super().connection_open()
-        seq = WebSocketProtocol.gen_new_seq()
-        self.session_id = "{}_{}".format(GlobalObject().id, seq)
-        WebsocketConnectionManager().store_connection(seq, self)
+        self.seq = WebSocketProtocol.gen_new_seq()
+        self.session_id = "{}_{}".format(GlobalObject().id, self.seq)
+        WebsocketConnectionManager().store_connection(self.seq, self)
 
     def connection_made(self, transport):
         super().connection_made(transport)
@@ -55,6 +61,12 @@ class WebSocketProtocol(WebSocketServerProtocol):
     def connection_lost(self, exc):
         super().connection_lost(exc)
         WebsocketConnectionManager().remove_connection(self)
+        SessionCache().del_cache(self.session_id)
+        # client连接断开
+        asyncio.ensure_future(websocket_route.call_target(CLIENT_OFFLINE, {}, session_id=self.session_id)
+                              , loop=GlobalObject().loop)
+        # GlobalObject().loop.run_until_complete(
+        #     websocket_route.call_target(CLIENT_OFFLINE, {}, session_id=self.session_id))
 
     def send_message(self, result, command_id):
         data = self.pack(result, command_id).decode("utf8")
@@ -104,6 +116,6 @@ class WebSocketProtocol(WebSocketServerProtocol):
         :return:
         """
         print("message_handle:", data)
-        result = await websocket_route.call_target(command_id, data, session_id=websocket.seq)
+        result = await websocket_route.call_target(command_id, data, session_id=self.session_id)
         if result:
             websocket.send(self.pack(result, command_id).decode("utf8"))

@@ -26,11 +26,15 @@ async def rpc_message_handle(command_id, data):
     :param data: dict, 消息内容
     :return:
     """
+    print("rpc_message_handle:", command_id, data)
     if not isinstance(data, dict):
+        print("aaaaaa:", type(data))
+        data = data.decode("utf-8") if isinstance(data, bytes) else data
         data = ujson.loads(data)
+    print("rpc_message_handle:", command_id, data, type(data))
     session_id = data.get("src", None)
     to = data.get("to", None)
-    info = data.get(data, {})
+    info = data.get("data", {})
     if to and to != GlobalObject().id:
         return await forwarding_next(command_id, info, session_id, to)
     else:
@@ -74,7 +78,7 @@ async def local_handle(command_id, data, session_id):
     :param session_id:
     :return:
     """
-    if NodeType.PROXY == GlobalObject.type:
+    if NodeType.PROXY == GlobalObject().type:
         # proxy类型节点收到rpc消息后会通过websocket推送给客户端
         seq = int(session_id.split("_")[-1])
         client = WebsocketConnectionManager().get_websocket(seq)

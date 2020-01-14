@@ -95,7 +95,7 @@ class Server(object):
 
         if ws_port and self.socket_handler:    # websocketserver port start
             GlobalObject().ws_server = self.loop.run_until_complete(
-                websockets.serve(self.socket_handler, self.host, ws_port,create_protocol=WebSocketProtocol))
+                websockets.serve(self.socket_handler, self.host, ws_port, create_protocol=WebSocketProtocol))
 
         if web_port and self.web_handler:      # web httpserver port  start
             GlobalObject().http_server = self.loop.run_until_complete(self.start_web(web_port))
@@ -110,14 +110,15 @@ class Server(object):
                 port = rp.get("port", 0)
                 s_type = NodeType.get_type(rp.get('type'))
                 if host and port:
-                    remote_serv = self.loop.create_connection(RpcPushProtocol, host=host, port=port)
                     RpcConnectionManager().add_type_node(s_type, host, port)
-
-                    try:
-                        self.loop.run_until_complete(remote_serv)
-                    except ConnectionRefusedError:
-                        print("HERE", RpcConnectionManager().conns)
-                        logger.info("connect to {}:{} failed!".format(host, port))
+                    RpcConnectionManager().store_connection(host, port, None)
+                    if not RpcConnectionManager().get_connection(host, port):
+                        remote_serv = self.loop.create_connection(RpcPushProtocol, host=host, port=port)
+                        try:
+                            self.loop.run_until_complete(remote_serv)
+                        except ConnectionRefusedError:
+                            print("HERE", RpcConnectionManager().conns)
+                            logger.info("connecting to {}:{} failed!".format(host, port))
 
     async def update_config_remote(self, server_type, addr_info={}):
         """
@@ -126,17 +127,18 @@ class Server(object):
         :param addr_info: dict, {host: port1, host2: port2, ...}
         :return:
         """
-        remote_names = ["{}_{}".format(k, v) for k, v in addr_info.items()]
+        remote_names = [RpcConnectionManager.gen_node_name(k, v) for k, v in addr_info.items()]
         for r in RpcConnectionManager().conns.keys():
             if r not in remote_names:
                 if RpcConnectionManager().conns[r]["status"] == ConnectionStatus.ESTABLISHED:
                     RpcConnectionManager().conns[r]["conn"].transport.close()
                 RpcConnectionManager().conns.pop(r)
         for k, v in addr_info.items():
-            name = "{}_{}".format(k, v)
+            name = RpcConnectionManager.gen_node_name(k, v)
             if name not in RpcConnectionManager().conns.keys() \
                     or RpcConnectionManager().conns[name]["status"] != ConnectionStatus.ESTABLISHED:
                 RpcConnectionManager().add_type_node(server_type, k, v)
+                RpcConnectionManager().store_connection(k, v, None)
                 try:
                     await self.loop.create_connection(RpcPushProtocol, host=k, port=v)
                     logger.info("success connect to {}:{}".format(k, v))
@@ -157,15 +159,17 @@ class Server(object):
     async def schedule(self):
         # 定时rpc断线重连
         while True:
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
             # logger.info("start new schedule task~")
-            # print(RpcConnectionManager().type_dict, RpcConnectionManager().conns)
+            # print("schedule:", RpcConnectionManager().type_dict, RpcConnectionManager().conns)
             for node_type, name_lst in RpcConnectionManager().type_dict.items():
                 for name in name_lst:
                     if name not in RpcConnectionManager().conns.keys()\
                             or ConnectionStatus.ESTABLISHED != RpcConnectionManager().conns[name]["status"]:
-                        host, port = name.split("_")
+                        host = RpcConnectionManager().conns[name]["host"]
+                        port = RpcConnectionManager().conns[name]["port"]
                         try:
+                            print("try to reconnect:",name,  host, port)
                             await self.loop.create_connection(RpcPushProtocol, host=host, port=port)
                             logger.info("success connect to {}:{}".format(host, port))
                         except ConnectionRefusedError as e:

@@ -36,7 +36,7 @@ class ObProtocol(asyncio.Protocol):
         raise NotImplementedError
 
     def connection_made(self, transport):
-        raise NotImplementedError
+        super(ObProtocol, self).connection_made(transport)
 
     def data_received(self, data):
         raise NotImplementedError
@@ -45,6 +45,6 @@ class ObProtocol(asyncio.Protocol):
         raise NotImplementedError
 
     def connection_lost(self, error):
-        raise NotImplementedError
+        super(ObProtocol, self).connection_lost(error)
 
 

@@ -11,6 +11,7 @@ from share.ob_log import logger
 from share.encodeutil import AesEncoder
 from base.ob_protocol import ObProtocol, DataException
 from rpcserver.route import rpc_message_handle
+from rpcserver.connection_manager import RpcConnectionManager
 from base.global_object import GlobalObject
 
 
@@ -87,7 +88,9 @@ class RpcProtocol(ObProtocol):
     def connection_made(self, transport):
         self.transport = transport
         # self.address = transport.get_extra_info('peername')
-        logger.debug('connection accepted')
+        address = transport.get_extra_info('peername')
+        # RpcConnectionManager().store_connection(*address, self)
+        logger.debug('connection accepted {}'.format(address))
 
     def data_received(self, data):
         logger.debug('rpcserver received {!r}'.format(data))

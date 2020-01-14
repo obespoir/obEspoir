@@ -19,7 +19,8 @@ class SessionCache(object, metaclass=Singleton):
             self.cache[session_id][node_type] = node_id
 
     def del_cache(self, session_id):
-        self.cache.pop(session_id)
+        if session_id in self.cache:
+            self.cache.pop(session_id)
 
     def get_node(self, session_id, node_type):
         return self.cache.get(session_id, {}).get(node_type, None)

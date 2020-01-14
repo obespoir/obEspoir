@@ -7,6 +7,7 @@ import asyncio
 import ujson
 import struct
 
+from base.common_define import ConnectionStatus
 from base.global_object import GlobalObject
 from rpcserver.connection_manager import RpcConnectionManager
 from share.encodeutil import AesEncoder
@@ -38,13 +39,16 @@ class RpcPushProtocol(asyncio.Protocol):
         :return: bytes
         """
         info = {"src": session_id, "to": to, "data": data}
-        data = self.encode_ins.encode(ujson.dumps(data))
+        if not isinstance(data, str):
+            data = ujson.dumps(data)
+        data = self.encode_ins.encode(data)
         # data = "%s" % data
         length = data.__len__() + self.head_len
         head = struct.pack(self.handfrt, length, command_id, self.version)
         return head + data
 
     async def send_message(self, command_id, message, session_id, to=None):
+        print("bbbbbbbb:", message, type(message))
         data = self.pack(message, command_id, session_id, to)
         print("rpc_push send_message:", data, type(data))
         self.transport.write(data)
@@ -53,7 +57,7 @@ class RpcPushProtocol(asyncio.Protocol):
         self.transport = transport
         address = transport.get_extra_info('peername')
         self.host, self.port = address
-        RpcConnectionManager().store_connection(*address, self)
+        RpcConnectionManager().store_connection(*address, self, status=ConnectionStatus.ESTABLISHED)
         logger.debug(
             'connected to {} port {}'.format(*address)
         )

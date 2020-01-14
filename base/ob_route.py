@@ -77,7 +77,7 @@ class ObRoute(object):
         self._lock.acquire()
         try:
             if not target:
-                logger.error('the command ' + str(targetKey) + ' not Found on service')
+                logger.warn('the command ' + str(targetKey) + ' not Found on service')
                 return None
 
             result = target(targetKey, *args, **kw)

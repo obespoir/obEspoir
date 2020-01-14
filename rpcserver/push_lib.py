@@ -26,12 +26,12 @@ async def call_remote_service(node_name, command_id, message, session_id=None, t
     return await RpcConnectionManager().send_message(node_name, command_id, message, session_id=session_id , to=to)
 
 
-async def find_available_node(next_node_type, to=None):
+def find_available_node(next_node_type, to=None):
     """
     寻找一个可用的节点，如果没有，则异步等待直到找到为止
     :param next_node_type:
-    :param to:
-    :return:
+    :param to: string, node name
+    :return: connect node object id
     """
     while True:
         if to and to in RpcConnectionManager().conns.keys() and ConnectionStatus.ESTABLISHED == \
@@ -49,8 +49,9 @@ async def find_available_node(next_node_type, to=None):
                     next_node = RpcConnectionManager().get_available_connection(NodeType.ROUTE)
             if not next_node:
                 logger.error("all route node dead!!!")
-                await asyncio.sleep(1)
+                asyncio.sleep(1)
                 continue
+
         return next_node
 
 
@@ -71,6 +72,7 @@ async def send_message(next_node_type, command_id, message, session_id=None, to=
 
     next_node = SessionCache().get_node(session_id, next_node_type)
     if not next_node:
-        next_node = await find_available_node(next_node_type, to=to)
-    print("send_message:", next_node)
+        next_node = find_available_node(next_node_type, to=to)
+    SessionCache().add_cache(session_id, node_type=next_node_type, node_id=next_node)
+    print("send_message:", next_node, command_id, message, session_id, to)
     await call_remote_service(next_node, command_id, message, session_id=session_id , to=to)

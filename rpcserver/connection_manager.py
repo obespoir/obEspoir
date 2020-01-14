@@ -16,7 +16,7 @@ from share.singleton import Singleton
 class RpcConnectionManager(object, metaclass=Singleton):
 
     def __init__(self):
-        self.conns = {}     # {conn_name: {status: int(0:未连接，1：连接中，2：连接断开), transport: transport}}
+        self.conns = {}     # {conn_name: {status: int(0:未连接，1：连接中，2：连接断开), conn: connect object}}
         self.type_dict = {}  # 存放节点类型信息 {int: [conn_name1, conn_name2, ...]}
     
     @staticmethod
@@ -31,20 +31,22 @@ class RpcConnectionManager(object, metaclass=Singleton):
 
     def get_available_connection(self, node_type):
         """
-        返回一个可用的连接
+        返回一个可用的连接名
         :param node_type:
-        :return:
+        :return: node name
         """
         cur_nodes = self.type_dict.get(node_type, [])
         available_nodes = []
         for name in cur_nodes:
+            print("aaaaaaa:", cur_nodes, self.conns)
             if ConnectionStatus.ESTABLISHED == self.conns[name]["status"]:
-                available_nodes.append(self.conns[name]["conn"])
+                available_nodes.append(name)
         return random.choice(available_nodes)
 
-    def store_connection(self, host, port, connect):
+    def store_connection(self, host, port, connect, status=ConnectionStatus.LOSE):
+        print("store_connection:", host, port, connect)
         self.conns[RpcConnectionManager.gen_node_name(host, port)] = {
-            "status": ConnectionStatus.ESTABLISHED, "conn": connect}
+            "status": status, "conn": connect, "host": host, "port": port}
 
     def lost_connection(self, host, port):
         name = RpcConnectionManager.gen_node_name(host, port)

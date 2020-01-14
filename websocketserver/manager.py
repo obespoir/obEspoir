@@ -3,7 +3,6 @@
 author = jamon
 """
 
-from bidict import bidict
 
 from share.singleton import Singleton
 
@@ -11,7 +10,7 @@ from share.singleton import Singleton
 class WebsocketConnectionManager(object, metaclass=Singleton):
 
     def __init__(self):
-        self.conns = bidict({})       # 会话序号（int）和websocket对象对应关系
+        self.conns = {}       # 会话序号（int）和websocket对象对应关系
 
     def store_connection(self, seq, websocket):
         if seq not in self.conns.keys():
@@ -19,9 +18,8 @@ class WebsocketConnectionManager(object, metaclass=Singleton):
         return 1
 
     def remove_connection(self, websocket):
-        seq = self.conns[:websocket]
-        if seq:
-            self.conns.pop(websocket)
+        if websocket in self.conns.values():
+            self.conns.pop(websocket.seq)
         return 1
 
     def get_websocket(self, seq):

@@ -21,7 +21,7 @@ if __name__ == "__main__":
     main_server.register_socket_route(WebsocketHandler().websocket_handler)
     serv_config = ParseJson.loads("proxy_config.json")
 
-    logger.init(module_name=serv_config.get("service_name"), log_dir=serv_config.get("log_dir", "../logs/")
+    logger.init(module_name=serv_config.get("name"), log_dir=serv_config.get("log_dir", "../logs/")
                 , level=serv_config.get("log_level", logging.DEBUG))
 
     main_server.start(serv_config)

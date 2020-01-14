@@ -53,7 +53,7 @@ async def forward_0(command_id, data, session_id):
     :param session_id: string
     :return:
     """
-    print("forward_0", command_id, data, type(data), session_id)
+    print("forward_0", command_id, data, type(data), data, session_id)
     if not isinstance(data, dict):
         try:
             data = ujson.loads(data)
