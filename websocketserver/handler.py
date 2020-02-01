@@ -13,10 +13,8 @@ from share.ob_log import logger
 from base.common_define import NodeType
 from base.ob_protocol import DataException
 from base.global_object import GlobalObject
-from websocketserver.protocol import WebSocketProtocol
 from websocketserver.route import webSocketRouteHandle
-from websocketserver.manager import WebsocketConnectionManager
-from rpcserver.push_lib import send_message
+from rpcserver.push_lib import push_message
 
 
 class WebsocketHandler(object, metaclass=Singleton):
@@ -30,6 +28,7 @@ class WebsocketHandler(object, metaclass=Singleton):
             try:
                 data = await asyncio.wait_for(websocket.recv(), timeout=GlobalObject().ws_timeout)
                 logger.debug('websocketserver received {!r}'.format(data))
+                # await websocket.send("hello")
                 while data:  # 解决TCP粘包问题
                     data = await websocket.process_data(data, websocket)
             except asyncio.TimeoutError:
@@ -51,7 +50,7 @@ async def forward_0(command_id, data, session_id):
     :param command_id: int
     :param data: json
     :param session_id: string
-    :return:
+    :return: None
     """
     print("forward_0", command_id, data, type(data), data, session_id)
     if not isinstance(data, dict):
@@ -62,6 +61,5 @@ async def forward_0(command_id, data, session_id):
             logger.warn("param data parse error {}".format(data))
             return {}
     data.update({"message_id": command_id})
-    session_id = GlobalObject().id
-    return await send_message(NodeType.ROUTE, command_id, data, session_id=session_id, to=None)
+    await push_message(NodeType.ROUTE, command_id, data, session_id=session_id, to=None)
 

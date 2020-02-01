@@ -37,8 +37,9 @@ class RpcConnectionManager(object, metaclass=Singleton):
         """
         cur_nodes = self.type_dict.get(node_type, [])
         available_nodes = []
+        print("get_available_connection: type_dict({}), conns({}), cur_nodes({})"
+              .format(self.type_dict, self.conns, cur_nodes))
         for name in cur_nodes:
-            print("aaaaaaa:", cur_nodes, self.conns)
             if ConnectionStatus.ESTABLISHED == self.conns[name]["status"]:
                 available_nodes.append(name)
         return random.choice(available_nodes)

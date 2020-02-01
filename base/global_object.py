@@ -46,9 +46,9 @@ class GlobalObject(object, metaclass=Singleton):
 
         self.rpc_password = config["rpc"]["token"]
         self.rpc_encode_type = config["rpc"]["encode"]
-        self.rpc_route = config["rpc"].get("route", {})
+        # self.rpc_route = config["rpc"].get("route", {})
         self.rpc_reconnect_time = config["rpc"].get("reconnect_time", 5)
-        if not self.validate_route():
+        if not self.format_rpc_route(config):
             raise Exception("route config error!")
         self.id = self.gen_id(config["host"], config["rpc"]["port"])
 
@@ -66,12 +66,13 @@ class GlobalObject(object, metaclass=Singleton):
         c_md5.update("{}_{}".format(host, port).encode("utf-8"))
         return c_md5.hexdigest()
 
-    def validate_route(self):
+    def format_rpc_route(self, config):
         """
-        验证路由配置是否正确
+        验证路由配置是否正确, 格式化rpc配置信息
         :return: 0/1
         """
-        for type_name, route in self.rpc_route.get("range", {}).items():
+        rpc_route = config["rpc"].get("route", {})
+        for type_name, route in rpc_route.get("range", {}).items():
             if not isinstance(route, list):
                 return 0
 
@@ -85,6 +86,12 @@ class GlobalObject(object, metaclass=Singleton):
             for s in route:
                 if not isinstance(s, int):
                     return 0
+
+        self.rpc_route = {"range": {}, "special": {}}
+        for type_name, route in rpc_route.get("range", {}).items():
+            self.rpc_route["range"][NodeType.get_type(type_name)] = route
+        for type_name, route in self.rpc_route.get("special", {}).items():
+            self.rpc_route["special"][NodeType.get_type(type_name)] = route
 
         return 1
 

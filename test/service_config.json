@@ -5,6 +5,7 @@
 
     "host": "127.0.0.1",
     "type": "service",
+    "api_path": "include_libs",   // api 路径
     "http": {
         "port": 22001,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 httpserver web通信
@@ -17,13 +18,12 @@
         "type": "service",                                   // 节点类型
 
         // rpc会收到三类消息：待本地处理消息、待转发的消息、待直接推送到websocket client的消息
-        "transfer_route": {                     //配置消息转发的路由
-            "default": "route",    // 默认路由
+        "route": {                     //配置消息转发的路径
             "range": {
-                "proxy": [[0, 100000]]
+                "service": [[5001, 10000]]
             },
             "special": {
-                            // like "websocketserver": [110119]
+                            // like "proxy": [110119]
             }
         }
     },

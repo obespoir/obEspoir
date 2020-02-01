@@ -35,7 +35,6 @@ class Server(object):
         self.host = None
         self.web_handler = {}
         self.socket_handler = None
-        self.rpc_handler = None
         self.loop = asyncio.get_event_loop()
 
     def register_web_route(self, url, handler):
@@ -54,14 +53,6 @@ class Server(object):
         :return:
         """
         self.socket_handler = handler
-
-    def register_rpc_route(self, handler):
-        """
-
-        :param handler:
-        :return:
-        """
-        self.rpc_handler = handler
 
     async def start_web(self, web_port):
         "http协议 web"
@@ -87,7 +78,9 @@ class Server(object):
         web_port = config.get("http", {}).get("port", 0)    # web httpserver port
         rpc_port = config.get("rpc", {}).get("port", 0)    # rpcserver port
         remote_ports = config.get("remote_ports", [])   # remote_ports list
-        # print([self.host, ws_port, web_port, rpc_port])
+        api_path = config.get("api_path", "")
+        if api_path:
+            __import__(api_path)
 
         GlobalObject().loop = self.loop
 

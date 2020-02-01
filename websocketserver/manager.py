@@ -23,5 +23,7 @@ class WebsocketConnectionManager(object, metaclass=Singleton):
         return 1
 
     def get_websocket(self, seq):
+        if seq not in self.conns.keys():
+            return
         return self.conns[seq]
 

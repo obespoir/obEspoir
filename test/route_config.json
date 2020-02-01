@@ -5,6 +5,7 @@
 
     "host": "127.0.0.1",
     "type": "route",
+    "api_path": "include_libs",   // api 路径
     "http": {
         "port": 21001,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 httpserver web通信
@@ -17,13 +18,12 @@
         "type": "game",                                   // 节点类型
 
         // rpc会收到三类消息：待本地处理消息、待转发的消息、待直接推送到websocket client的消息
-        "transfer_route": {                     //配置消息转发的路由
-            "default": "proxy",    // 默认路由
+        "route": {                     //配置消息转发的路由
             "range": {
-                "proxy": [[0, 100000]]
+                "route": [[0, 5000]], "service": [[5001, 10000]]
             },
             "special": {
-                            // like "websocketserver": [110119]
+                "route":  [1000] // like "proxy": [110119]
             }
         }
     },
@@ -35,6 +35,13 @@
             "token": "helloworldiloveyou~1234567890123",
             "encode": 0,
             "type": "proxy"                      // 节点类型(字符串标识)
+        },
+        {
+            "host": "127.0.0.1",
+            "port":  22002,
+            "token": "helloworldiloveyou~1234567890123",
+            "encode": 0,
+            "type": "service"                      // 节点类型(字符串标识)
         }
     ]
 

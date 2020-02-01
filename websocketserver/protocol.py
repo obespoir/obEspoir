@@ -68,9 +68,10 @@ class WebSocketProtocol(WebSocketServerProtocol):
         # GlobalObject().loop.run_until_complete(
         #     websocket_route.call_target(CLIENT_OFFLINE, {}, session_id=self.session_id))
 
-    def send_message(self, result, command_id):
-        data = self.pack(result, command_id).decode("utf8")
-        self.send(data)
+    async def send_message(self, result, command_id):
+        data = self.pack(result, command_id)
+        print("ddddddd:", data, type(self), self)
+        await self.send(data)
 
     def pack(self, data, command_id):
         """
@@ -115,7 +116,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
         :param data:
         :return:
         """
-        print("message_handle:", data)
+        print("message_handle:", data, websocket, type(websocket))
         result = await websocket_route.call_target(command_id, data, session_id=self.session_id)
         if result:
             websocket.send(self.pack(result, command_id).decode("utf8"))

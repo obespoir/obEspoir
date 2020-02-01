@@ -8,9 +8,9 @@ CLIENT_OFFLINE = 999   # 连接断开
 
 
 class NodeType(object):
-    PROXY = 0        # 代理节点
-    ROUTE = 1        # 路由节点
-    SERVICE = 2      # 服务节点
+    PROXY = 1        # 代理节点
+    ROUTE = 2        # 路由节点
+    SERVICE = 3      # 服务节点
 
     @classmethod
     def to_dict(cls):

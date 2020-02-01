@@ -58,7 +58,7 @@ class AesEncoder(object, metaclass=Singleton):
         :param msg:
         :return: bytes
         """
-        print("cccccc:", self.encode_type, self.NONE_TYPE, type(msg))
+        # print("cccccc:", self.encode_type, self.NONE_TYPE, type(msg))
         if isinstance(msg, str):
             msg = bytes(msg, encoding="utf8")
         if self.encode_type == self.NONE_TYPE:

@@ -57,14 +57,22 @@ async def test_websocket_proxy():
     async with websockets.connect("ws://127.0.0.1:20000") as websocket:
         name = "jamon"
         print("send server: ", name)
-        data = RpcProtocol().pack(ujson.dumps({"name": name}), 1000)
-        print("data=", data)
-        await websocket.send(data)
-        greeting = await websocket.recv()
-        print("receive from server: ", greeting)
+        rpc = RpcProtocol()
+        data_1000 = rpc.pack(ujson.dumps({"name": name}), 1000)
+        print("send_1000:", data_1000)
+        await websocket.send(data_1000)
+        recv_1000 = await websocket.recv()
+        print("recv_1000: ", recv_1000)
         # ret = await websocketserver.close(reason="user exit")
         ret = await asyncio.sleep(10)
         print("t::::::", ret)
+        data_10000 = rpc.pack(ujson.dumps({"dounai": "ok"}), 10000)
+        print("send_10000:", data_10000)
+        await websocket.send(data_10000)
+        recv_10000 = await websocket.recv()
+        print("recv_10000:", recv_10000)
+
+
 
 
 
