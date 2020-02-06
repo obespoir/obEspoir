@@ -78,5 +78,5 @@ async def test_websocket_proxy():
 
 
 if __name__ == "__main__":
-    # test_http_web_proxy()
+    test_http_web_proxy()
     asyncio.get_event_loop().run_until_complete(test_websocket_proxy())

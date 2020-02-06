@@ -16,6 +16,7 @@ from rpcserver.connection_manager import RpcConnectionManager
 from websocketserver.protocol import WebSocketProtocol
 from base.global_object import GlobalObject
 from share.ob_log import logger
+from share.singleton import Singleton
 
 
 try:
@@ -26,7 +27,7 @@ except ImportError:
     pass
 
 
-class Server(object):
+class Server(object, metaclass=Singleton):
     """
     启动server主类
     """
