@@ -10,6 +10,7 @@ import websockets
 from aiohttp import web
 
 from base.common_define import NodeType, ConnectionStatus
+from db.mongo import AvailServerConfig
 from rpcserver.protocol import RpcProtocol
 from rpcserver.push_protocol import RpcPushProtocol
 from rpcserver.connection_manager import RpcConnectionManager
@@ -58,7 +59,6 @@ class Server(object, metaclass=Singleton):
     async def start_web(self, web_port):
         "http协议 web"
         app = web.Application()
-        self.web_handler["/update_config"] = self.update_config_remote
         for k, v in self.web_handler.items():
             app.router.add_route("*", k, v)
         runner = web.AppRunner(app)
@@ -79,6 +79,10 @@ class Server(object, metaclass=Singleton):
         web_port = config.get("http", {}).get("port", 0)    # web httpserver port
         rpc_port = config.get("rpc", {}).get("port", 0)    # rpcserver port
         remote_ports = config.get("remote_ports", [])   # remote_ports list
+        if "mongo" == config.get("available_way", "local") and config.get("mongo_uri", ""):
+            # 如果高可用使用的是MongoDB存储配置方式
+            remote_ports = AvailServerConfig.get_instance(uri=config.get("mongo_uri"))
+        GlobalObject().update_remote_ports(remote_ports)
         api_path = config.get("api_path", "")
         if api_path:
             __import__(api_path)
@@ -114,30 +118,31 @@ class Server(object, metaclass=Singleton):
                             print("HERE", RpcConnectionManager().conns)
                             logger.info("connecting to {}:{} failed!".format(host, port))
 
-    async def update_config_remote(self, server_type, addr_info={}):
+    async def update_remote_rpc_config(self):
         """
         更新远程rpc连接
         :param server_type: int, 待更新的服务节点类型
         :param addr_info: dict, {host: port1, host2: port2, ...}
         :return:
         """
-        remote_names = [RpcConnectionManager.gen_node_name(k, v) for k, v in addr_info.items()]
-        for r in RpcConnectionManager().conns.keys():
-            if r not in remote_names:
-                if RpcConnectionManager().conns[r]["status"] == ConnectionStatus.ESTABLISHED:
-                    RpcConnectionManager().conns[r]["conn"].transport.close()
-                RpcConnectionManager().conns.pop(r)
-        for k, v in addr_info.items():
-            name = RpcConnectionManager.gen_node_name(k, v)
-            if name not in RpcConnectionManager().conns.keys() \
-                    or RpcConnectionManager().conns[name]["status"] != ConnectionStatus.ESTABLISHED:
-                RpcConnectionManager().add_type_node(server_type, k, v)
-                RpcConnectionManager().store_connection(k, v, None)
-                try:
-                    await self.loop.create_connection(RpcPushProtocol, host=k, port=v)
-                    logger.info("success connect to {}:{}".format(k, v))
-                except ConnectionRefusedError as e:
-                    logger.error("try connect to {}:{} failed!")
+        for server_type, addr_info in GlobalObject().remote_ports.items():
+            remote_names = [RpcConnectionManager.gen_node_name(k, v) for k, v in addr_info.items()]
+            for r in RpcConnectionManager().conns.keys():
+                if r not in remote_names:
+                    if RpcConnectionManager().conns[r]["status"] == ConnectionStatus.ESTABLISHED:
+                        RpcConnectionManager().conns[r]["conn"].transport.close()
+                    RpcConnectionManager().conns.pop(r)
+            for k, v in addr_info.items():
+                name = RpcConnectionManager.gen_node_name(k, v)
+                if name not in RpcConnectionManager().conns.keys() \
+                        or RpcConnectionManager().conns[name]["status"] != ConnectionStatus.ESTABLISHED:
+                    RpcConnectionManager().add_type_node(server_type, k, v)
+                    RpcConnectionManager().store_connection(k, v, None)
+                    try:
+                        await self.loop.create_connection(RpcPushProtocol, host=k, port=v)
+                        logger.info("success connect to {}:{}".format(k, v))
+                    except ConnectionRefusedError as e:
+                        logger.error("try connect to {}:{} failed!")
 
     async def send_message(self, remote_name, message):
         if remote_name not in RpcConnectionManager().conns.keys():

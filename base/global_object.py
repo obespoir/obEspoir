@@ -34,6 +34,7 @@ class GlobalObject(object, metaclass=Singleton):
         self.ws_no_state_msg = {}        # 无状态的消息配置
 
         self.loop = None
+        self.remote_ports = {}      # {type1: [{}, ...], type2: [{}, ...]}
 
     def init_from_config(self, config={}):
         """
@@ -65,6 +66,19 @@ class GlobalObject(object, metaclass=Singleton):
         c_md5 = hashlib.md5()
         c_md5.update("{}_{}".format(host, port).encode("utf-8"))
         return c_md5.hexdigest()
+
+    def update_remote_ports(self, remote_ports):
+        """
+
+        :param remote_ports: [{}, ...]
+        :return:
+        """
+        for info in remote_ports:
+            t = info.get("type")
+            if t not in self.remote_ports.keys():
+                self.remote_ports[t] = info
+            else:
+                self.remote_ports[t].append(info)
 
     def format_rpc_route(self, config):
         """

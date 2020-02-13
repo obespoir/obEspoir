@@ -6,13 +6,15 @@
     "host": "127.0.0.1",
     "type": "proxy",
     "api_path": "include_libs",   // api 路径
-    "route": [              // 路由节点
+    "available_way": "local",   // 高可用性配置使用哪种方式存储： local（本地文件存储）, mongo(mongodb存储)
+    "mongo_uri":"mongodb://test:xxxx@xxxx.mongodb.rds.aliyuncs.com:3717,xxxx.mongodb.rds.aliyuncs.com:3717/admin",
+    "remote_ports": [
         {
             "host": "127.0.0.1",
             "port":  21002,
             "token": "helloworldiloveyou~1234567890123",
             "encode": 0,
-            "type": "game"                      // 节点类型(字符串标识)
+            "type": "route"                      // 节点类型(字符串标识)
         }
     ],
     "websocket": {
@@ -36,16 +38,5 @@
         "encode": 0,                                      // 是否启用加密
         "type": "proxy",                                   // 节点类型
         "reconnect_time": 5                              // 连接断开时重连时间间隔，默认最多重试3次
-    },
-
-    "remote_ports": [
-        {
-            "host": "127.0.0.1",
-            "port":  21002,
-            "token": "helloworldiloveyou~1234567890123",
-            "encode": 0,
-            "type": "route"                      // 节点类型(字符串标识)
-        }
-    ]
-
+    }
 }
