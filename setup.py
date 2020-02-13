@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="obEspoir",
-    version="0.1.0",
+    version="0.1.1",
     keywords=("pip", "obEspoir", "game", "server", "frame", "distribute"),
     description="a distribute game frame",
     long_description="a distribute game frame",
