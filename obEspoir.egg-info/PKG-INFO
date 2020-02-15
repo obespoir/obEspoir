@@ -1,0 +1,12 @@
+Metadata-Version: 1.2
+Name: obEspoir
+Version: 0.1.2
+Summary: a distribute game frame
+Home-page: https://gitee.com/jamon/obEspoir.git
+Author: jamon
+Author-email: jamonhe@foxmail.com
+License: MIT Licence
+Description: a distribute game frame
+Keywords: pip,obEspoir,game,server,frame,distribute
+Platform: any
+Requires-Python: >=3.6

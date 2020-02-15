@@ -1,0 +1,25 @@
+[2020-02-15 13:43:44,181]-INFO    <route_1> {server.py:67} -> server started at httpserver://127.0.0.1:21001...
+[2020-02-15 13:43:44,183]-DEBUG   <route_1> {push_protocol.py:62} -> connected to 127.0.0.1 port 20002
+[2020-02-15 13:43:44,183]-INFO    <route_1> {server.py:119} -> connecting to 127.0.0.1:22002 failed!
+[2020-02-15 13:43:44,526]-DEBUG   <route_1> {protocol.py:54} -> connection accepted ('127.0.0.1', 59710)
+[2020-02-15 13:43:47,185]-ERROR   <route_1> {server.py:175} -> schedule try connect to {}:{} failed!
+[2020-02-15 13:43:48,354]-DEBUG   <route_1> {protocol.py:54} -> connection accepted ('127.0.0.1', 59714)
+[2020-02-15 13:43:50,187]-DEBUG   <route_1> {push_protocol.py:62} -> connected to 127.0.0.1 port 22002
+[2020-02-15 13:43:50,187]-INFO    <route_1> {server.py:173} -> success connect to 127.0.0.1:22002
+[2020-02-15 13:43:54,804]-DEBUG   <route_1> {protocol.py:57} -> rpcserver received b't\x00\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00{"src":"3a868e96c1d28dac1076c9108fbfec48_1","to":null,"data":"{\\"name\\":\\"jamon\\",\\"message_id\\":1000}"}'
+[2020-02-15 13:43:54,805]-INFO    <route_1> {ob_protocol.py:55} -> here22222: [104, 104, (116, 1000, 0)]
+[2020-02-15 13:43:54,805]-INFO    <route_1> {ob_protocol.py:60} -> hhhhhhhhhhhhhhhhhhh 104, b'{"src":"3a868e96c1d28dac1076c9108fbfec48_1","to":null,"data":"{\\"name\\":\\"jamon\\",\\"message_id\\":100'
+[2020-02-15 13:43:54,805]-INFO    <route_1> {ob_protocol.py:66} -> here3333333: [0, 0, b'']
+[2020-02-15 13:43:54,805]-INFO    <route_1> {handler.py:14} -> login_1000:()  {}
+[2020-02-15 13:43:54,805]-DEBUG   <route_1> {connection_manager.py:110} -> rpcserver send {"code":200}
+[2020-02-15 13:44:04,813]-DEBUG   <route_1> {protocol.py:57} -> rpcserver received b't\x00\x00\x00\x10\'\x00\x00\x00\x00\x00\x00{"src":"3a868e96c1d28dac1076c9108fbfec48_1","to":null,"data":"{\\"dounai\\":\\"ok\\",\\"message_id\\":10000}"}'
+[2020-02-15 13:44:04,813]-INFO    <route_1> {ob_protocol.py:55} -> here22222: [104, 104, (116, 10000, 0)]
+[2020-02-15 13:44:04,813]-INFO    <route_1> {ob_protocol.py:60} -> hhhhhhhhhhhhhhhhhhh 104, b'{"src":"3a868e96c1d28dac1076c9108fbfec48_1","to":null,"data":"{\\"dounai\\":\\"ok\\",\\"message_id\\":1000'
+[2020-02-15 13:44:04,813]-INFO    <route_1> {ob_protocol.py:66} -> here3333333: [0, 0, b'']
+[2020-02-15 13:44:04,814]-INFO    <route_1> {handler.py:32} -> heartbeat: (), {}
+[2020-02-15 13:44:04,814]-DEBUG   <route_1> {connection_manager.py:110} -> rpcserver send {"code":200}
+[2020-02-15 13:44:04,818]-DEBUG   <route_1> {protocol.py:57} -> rpcserver received b'`\x00\x00\x00\xe7\x03\x00\x00\x00\x00\x00\x00{"src":"3a868e96c1d28dac1076c9108fbfec48_1","to":null,"data":"{\\"message_id\\":999}"}'
+[2020-02-15 13:44:04,818]-INFO    <route_1> {ob_protocol.py:55} -> here22222: [84, 84, (96, 999, 0)]
+[2020-02-15 13:44:04,819]-INFO    <route_1> {ob_protocol.py:60} -> hhhhhhhhhhhhhhhhhhh 84, b'{"src":"3a868e96c1d28dac1076c9108fbfec48_1","to":null,"data":"{\\"message_id\\":999}"}'
+[2020-02-15 13:44:04,819]-INFO    <route_1> {ob_protocol.py:66} -> here3333333: [0, 0, b'']
+[2020-02-15 13:44:04,819]-INFO    <route_1> {handler.py:23} -> offline: (), {}
