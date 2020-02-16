@@ -10,10 +10,10 @@ if __name__ == "__main__":
 
 import logging
 
-from websocketserver.handler import WebsocketHandler
-from share.parse_json import ParseJson
-from server.server import Server
-from share.ob_log import logger
+from obespoir.websocketserver.handler import WebsocketHandler
+from obespoir.share.parse_json import ParseJson
+from obespoir.server.server import Server
+from obespoir.share.ob_log import logger
 
 
 if __name__ == "__main__":

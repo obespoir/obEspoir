@@ -7,11 +7,11 @@ import asyncio
 import struct
 import ujson
 
-from share.ob_log import logger
-from share.encodeutil import AesEncoder
-from base.ob_protocol import ObProtocol
-from rpcserver.route import rpc_message_handle
-from base.global_object import GlobalObject
+from obespoir.share.ob_log import logger
+from obespoir.share.encodeutil import AesEncoder
+from obespoir.base.ob_protocol import ObProtocol
+from obespoir.rpcserver.route import rpc_message_handle
+from obespoir.base.global_object import GlobalObject
 
 
 class RpcProtocol(ObProtocol):

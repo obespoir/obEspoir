@@ -3,7 +3,7 @@
 author = jamon
 """
 
-from base.ob_route import ObRoute
+from obespoir.base.ob_route import ObRoute
 
 
 class WebSocketRoute(ObRoute):

@@ -9,15 +9,15 @@ import websockets
 
 from aiohttp import web
 
-from base.common_define import NodeType, ConnectionStatus
-from db.mongo import AvailServerConfig
-from rpcserver.protocol import RpcProtocol
-from rpcserver.push_protocol import RpcPushProtocol
-from rpcserver.connection_manager import RpcConnectionManager
-from websocketserver.protocol import WebSocketProtocol
-from base.global_object import GlobalObject
-from share.ob_log import logger
-from share.singleton import Singleton
+from obespoir.base.common_define import NodeType, ConnectionStatus
+from obespoir.db.mongo import AvailServerConfig
+from obespoir.rpcserver.protocol import RpcProtocol
+from obespoir.rpcserver.push_protocol import RpcPushProtocol
+from obespoir.rpcserver.connection_manager import RpcConnectionManager
+from obespoir.websocketserver.protocol import WebSocketProtocol
+from obespoir.base.global_object import GlobalObject
+from obespoir.share.ob_log import logger
+from obespoir.share.singleton import Singleton
 
 
 try:

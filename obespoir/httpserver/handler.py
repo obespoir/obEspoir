@@ -5,8 +5,9 @@ author = jamon
 
 from aiohttp import web
 
-from httpserver.route import HttpHandler
-from server.server import Server
+from obespoir.httpserver.route import HttpHandler
+from obespoir.server.server import Server
+
 
 @HttpHandler("/")
 async def index(request):
@@ -15,5 +16,5 @@ async def index(request):
 
 @HttpHandler("/update_remote_rpc_config")
 async def update_remote_rpc_config(request):
-    await Server().update_config_remote()
+    await Server().update_remote_rpc_config()
     return web.Response(body="ok~", content_type="text/html")

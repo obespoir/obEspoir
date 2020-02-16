@@ -6,7 +6,7 @@ author = jamon
 import threading
 
 from asyncio.coroutines import iscoroutine
-from share.ob_log import logger
+from obespoir.share.ob_log import logger
 
 
 class RpcMsgType(object):

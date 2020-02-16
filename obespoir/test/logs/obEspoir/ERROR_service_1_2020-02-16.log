@@ -1,0 +1,2 @@
+[2020-02-16 14:18:52,078]-ERROR   <service_1_error> {server.py:175} -> schedule try connect to {}:{} failed!
+[2020-02-16 14:18:55,083]-ERROR   <service_1_error> {server.py:175} -> schedule try connect to {}:{} failed!

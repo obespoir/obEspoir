@@ -7,10 +7,10 @@ import asyncio
 import random
 import ujson
 
-from base.common_define import ConnectionStatus
-from base.global_object import GlobalObject
-from share.ob_log import logger
-from share.singleton import Singleton
+from obespoir.base.common_define import ConnectionStatus
+from obespoir.base.global_object import GlobalObject
+from obespoir.share.ob_log import logger
+from obespoir.share.singleton import Singleton
 
 
 class RpcConnectionManager(object, metaclass=Singleton):

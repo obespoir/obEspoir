@@ -7,11 +7,11 @@ import asyncio
 import random
 import time
 
-from base.common_define import NodeType, ConnectionStatus
-from base.global_object import GlobalObject
-from rpcserver.connection_manager import RpcConnectionManager
-from rpcserver.session_cache import SessionCache
-from share.ob_log import logger
+from obespoir.base.common_define import NodeType, ConnectionStatus
+from obespoir.base.global_object import GlobalObject
+from obespoir.rpcserver.connection_manager import RpcConnectionManager
+from obespoir.rpcserver.session_cache import SessionCache
+from obespoir.share.ob_log import logger
 
 
 async def call_remote_service(node_name, command_id, message, session_id=None, to=None):

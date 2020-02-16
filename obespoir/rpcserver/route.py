@@ -5,12 +5,12 @@ author = jamon
 
 import ujson
 
-from base.ob_handler import RegisterEvent
-from base.common_define import NodeType
-from base.global_object import GlobalObject
-from rpcserver.push_lib import push_message
-from share.ob_log import logger
-from websocketserver.manager import WebsocketConnectionManager
+from obespoir.base.ob_handler import RegisterEvent
+from obespoir.base.common_define import NodeType
+from obespoir.base.global_object import GlobalObject
+from obespoir.rpcserver.push_lib import push_message
+from obespoir.share.ob_log import logger
+from obespoir.websocketserver.manager import WebsocketConnectionManager
 
 
 async def call_target(command_id, data, session_id):

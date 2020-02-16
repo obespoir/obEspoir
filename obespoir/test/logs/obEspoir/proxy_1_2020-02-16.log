@@ -1,0 +1,4 @@
+[2020-02-16 14:18:51,096]-DEBUG   <proxy_1> {protocol.py:61} -> received EOF
+[2020-02-16 14:18:51,100]-DEBUG   <proxy_1> {protocol.py:69} -> closing
+[2020-02-16 14:18:51,102]-DEBUG   <proxy_1> {push_protocol.py:70} -> rpc_push received EOF
+[2020-02-16 14:18:52,076]-ERROR   <proxy_1> {server.py:175} -> schedule try connect to {}:{} failed!

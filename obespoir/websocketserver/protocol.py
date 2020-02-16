@@ -8,13 +8,13 @@ import struct
 import threading
 from websockets.server import WebSocketServerProtocol
 
-from base.common_define import CLIENT_OFFLINE
-from base.global_object import GlobalObject
-from base.ob_protocol import DataException
-from rpcserver.session_cache import SessionCache
-from share.encodeutil import AesEncoder
-from websocketserver.route import websocket_route
-from websocketserver.manager import WebsocketConnectionManager
+from obespoir.base.common_define import CLIENT_OFFLINE
+from obespoir.base.global_object import GlobalObject
+from obespoir.base.ob_protocol import DataException
+from obespoir.rpcserver.session_cache import SessionCache
+from obespoir.share.encodeutil import AesEncoder
+from obespoir.websocketserver.route import websocket_route
+from obespoir.websocketserver.manager import WebsocketConnectionManager
 
 
 class WebSocketProtocol(WebSocketServerProtocol):

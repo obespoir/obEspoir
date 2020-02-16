@@ -4,7 +4,7 @@ author = jamon
 """
 
 
-from share.singleton import Singleton
+from obespoir.share.singleton import Singleton
 
 
 class WebsocketConnectionManager(object, metaclass=Singleton):

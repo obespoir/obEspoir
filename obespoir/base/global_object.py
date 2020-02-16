@@ -5,8 +5,8 @@ author = jamon
 
 import hashlib
 
-from base.common_define import NodeType
-from share.singleton import Singleton
+from obespoir.base.common_define import NodeType
+from obespoir.share.singleton import Singleton
 
 
 class GlobalObject(object, metaclass=Singleton):

@@ -5,8 +5,8 @@
 """
 
 from Crypto.Cipher import AES
-from share.singleton import Singleton
-from share.ob_log import logger
+from obespoir.share.singleton import Singleton
+from obespoir.share.ob_log import logger
 
 import json
 

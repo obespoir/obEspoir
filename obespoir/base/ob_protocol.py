@@ -7,8 +7,9 @@ import asyncio
 import struct
 import ujson
 
-from base.global_object import GlobalObject
-from share.ob_log import logger
+from obespoir.base.global_object import GlobalObject
+from obespoir.share.ob_log import logger
+
 
 class DataException(Exception):
 

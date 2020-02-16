@@ -5,7 +5,7 @@ author = jamon
 
 from pymongo import MongoClient
 
-from share.ob_log import logger
+from obespoir.share.ob_log import logger
 
 
 class AvailServerConfig(object):

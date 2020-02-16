@@ -3,8 +3,8 @@
 author = jamon
 """
 
-from base.ob_handler import BaseHandler, RegisterEvent
-from share.ob_log import logger
+from obespoir.base.ob_handler import BaseHandler, RegisterEvent
+from obespoir.share.ob_log import logger
 
 
 @RegisterEvent(1000)

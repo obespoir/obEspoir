@@ -5,7 +5,7 @@ author = jamon
 
 import struct
 
-from share.encodeutil import AesEncoder
+from obespoir.share.encodeutil import AesEncoder
 
 
 class DataPack(object):

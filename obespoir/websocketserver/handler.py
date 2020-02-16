@@ -8,13 +8,13 @@ import ujson
 
 from websockets.exceptions import ConnectionClosed
 
-from share.singleton import Singleton
-from share.ob_log import logger
-from base.common_define import NodeType
-from base.ob_protocol import DataException
-from base.global_object import GlobalObject
-from websocketserver.route import webSocketRouteHandle
-from rpcserver.push_lib import push_message
+from obespoir.share.singleton import Singleton
+from obespoir.share.ob_log import logger
+from obespoir.base.common_define import NodeType
+from obespoir.base.ob_protocol import DataException
+from obespoir.base.global_object import GlobalObject
+from obespoir.websocketserver.route import webSocketRouteHandle
+from obespoir.rpcserver.push_lib import push_message
 
 
 class WebsocketHandler(object, metaclass=Singleton):

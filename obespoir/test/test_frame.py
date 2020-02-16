@@ -9,7 +9,7 @@ import struct
 import ujson
 import websockets
 
-from share.encodeutil import AesEncoder
+from obespoir.share.encodeutil import AesEncoder
 
 
 class RpcProtocol(object):

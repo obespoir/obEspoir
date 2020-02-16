@@ -10,5 +10,5 @@ class HttpHandler(object):
         self.url = url
 
     def __call__(self, handler):
-        from server.server import Server
+        from obespoir.server.server import Server
         Server().register_web_route(self.url, handler)
