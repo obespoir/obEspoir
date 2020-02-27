@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
 import logging
 
-from obespoir.websocketserver.handler import WebsocketHandler
+from obespoir.websocketserver.route import WebsocketHandler
 from obespoir.share.parse_json import ParseJson
 from obespoir.server.server import Server
 from obespoir.share.ob_log import logger

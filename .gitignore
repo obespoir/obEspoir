@@ -1,3 +1,5 @@
 /test/logs/
 /build/
 /dist/
+/obEspoir.egg-info/
+/obespoir/test/logs/

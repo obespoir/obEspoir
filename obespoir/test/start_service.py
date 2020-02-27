@@ -10,7 +10,6 @@ if __name__ == "__main__":
 
 import logging
 
-from obespoir.websocketserver.handler import WebsocketHandler
 from obespoir.share.parse_json import ParseJson
 from obespoir.server.server import Server
 from obespoir.share.ob_log import logger
@@ -18,7 +17,7 @@ from obespoir.share.ob_log import logger
 
 if __name__ == "__main__":
     main_server = Server()
-    main_server.register_socket_route(WebsocketHandler().websocket_handler)
+    # main_server.register_socket_route(WebsocketHandler().websocket_handler)
     serv_config = ParseJson.loads("service_config.json")
 
     logger.init(module_name=serv_config.get("name"), log_dir=serv_config.get("log_dir", "../logs/")
