@@ -1,5 +1,0 @@
-[2020-02-16 14:18:51,099]-DEBUG   <service_1> {push_protocol.py:70} -> rpc_push received EOF
-[2020-02-16 14:18:51,103]-DEBUG   <service_1> {protocol.py:61} -> received EOF
-[2020-02-16 14:18:51,105]-DEBUG   <service_1> {protocol.py:69} -> closing
-[2020-02-16 14:18:52,078]-ERROR   <service_1> {server.py:175} -> schedule try connect to {}:{} failed!
-[2020-02-16 14:18:55,083]-ERROR   <service_1> {server.py:175} -> schedule try connect to {}:{} failed!

@@ -1,8 +1,0 @@
-[2020-02-15 13:43:48,353]-INFO    <service_1> {server.py:67} -> server started at httpserver://127.0.0.1:22001...
-[2020-02-15 13:43:48,354]-DEBUG   <service_1> {push_protocol.py:62} -> connected to 127.0.0.1 port 21002
-[2020-02-15 13:43:50,187]-DEBUG   <service_1> {protocol.py:54} -> connection accepted ('127.0.0.1', 59715)
-[2020-02-16 14:18:51,099]-DEBUG   <service_1> {push_protocol.py:70} -> rpc_push received EOF
-[2020-02-16 14:18:51,103]-DEBUG   <service_1> {protocol.py:61} -> received EOF
-[2020-02-16 14:18:51,105]-DEBUG   <service_1> {protocol.py:69} -> closing
-[2020-02-16 14:18:52,078]-ERROR   <service_1> {server.py:175} -> schedule try connect to {}:{} failed!
-[2020-02-16 14:18:55,083]-ERROR   <service_1> {server.py:175} -> schedule try connect to {}:{} failed!

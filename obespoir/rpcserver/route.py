@@ -6,7 +6,7 @@ author = jamon
 import ujson
 
 from obespoir.base.ob_handler import RegisterEvent
-from obespoir.base.common_define import NodeType
+from obespoir.base.common_define import NodeType, DEFAULT_ID
 from obespoir.base.global_object import GlobalObject
 from obespoir.rpcserver.push_lib import push_message
 from obespoir.share.ob_log import logger
@@ -22,6 +22,7 @@ async def call_target(command_id, data, session_id):
     :return:
     """
     obj = RegisterEvent.events.get(command_id, None)
+    obj = obj if obj else RegisterEvent.events.get(DEFAULT_ID, None)   # 如果没有，则进入默认消息处理
     if not obj:
         logger.error("command_id {} not register!".format(command_id))
         return

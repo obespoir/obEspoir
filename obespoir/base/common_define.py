@@ -3,7 +3,7 @@
 author = jamon
 """
 
-
+DEFAULT_ID = 0  # 默认的消息处理
 CLIENT_OFFLINE = 999   # 连接断开
 
 

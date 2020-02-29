@@ -3,8 +3,18 @@
 author = jamon
 """
 
+from obespoir.base.common_define import DEFAULT_ID
 from obespoir.base.ob_handler import BaseHandler, RegisterEvent
 from obespoir.share.ob_log import logger
+
+
+@RegisterEvent(DEFAULT_ID)
+class DefaultHandler(BaseHandler):
+
+    async def execute(self, *args, **kwargs):
+        logger.info("default handler:{}  {}".format(args, kwargs))
+        print("aaaaaaaa:", self.command_id, self.session_id)
+        return {"code": 200}
 
 
 @RegisterEvent(1000)
