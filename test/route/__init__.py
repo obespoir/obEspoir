@@ -2,5 +2,3 @@
 """
 author = jamon
 """
-
-version = "0.1.9"

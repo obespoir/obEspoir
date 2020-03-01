@@ -5,10 +5,10 @@
 
     "host": "127.0.0.1",
     "type": "proxy",
-    "api_path": "include_libs",   // api 路径
-    "available_way": "local",   // 高可用性配置使用哪种方式存储： local（本地文件存储）, mongo(mongodb存储)
-    "mongo_uri":"mongodb://test:xxxx@xxxx.mongodb.rds.aliyuncs.com:3717,xxxx.mongodb.rds.aliyuncs.com:3717/admin",
-    "remote_ports": [
+    "api_path": "proxy.include_libs",   // api 路径, 项目启动时导入自定义的各类api模块的地方
+    "available_way": "local",   // 高可用性配置使用哪种方式存储： local（本地文件存储，默认方式）, mongo(mongodb存储)
+    "mongo_uri":"mongodb://test:xxxx@xxxx.mongodb.rds.aliyuncs.com:3717,xxxx.mongodb.rds.aliyuncs.com:3717/admin",       // 如果使用了MongoDB作为存储，则该项需要配置
+    "remote_ports": [       //需要连接的远程rpc端口信息
         {
             "host": "127.0.0.1",
             "port":  21002,
@@ -17,7 +17,7 @@
             "type": "route"                      // 节点类型(字符串标识)
         }
     ],
-    "websocket": {
+    "websocket": {           // 本地监听的websocket端口配置
         "port": 20000,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 websocket通信
         "encode": 0,                                      // 是否启用加密
@@ -27,12 +27,12 @@
             "special": []       // like "game": [110119]
         }
     },
-    "http": {
+    "http": {						// 本地监听的http端口信息
         "port": 20001,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 httpserver web通信
         "encode": 0                                       // 是否启用加密
     },
-    "rpc": {
+    "rpc": {           // 本地监听的rpc端口信息
         "port": 20002,
         "token": "helloworldiloveyou~1234567890123",      // 32位秘钥 rpc通信
         "encode": 0,                                      // 是否启用加密

@@ -5,6 +5,7 @@ author = jamon
 
 
 import asyncio
+from contextlib import suppress
 import websockets
 
 from aiohttp import web
@@ -178,6 +179,11 @@ class Server(object, metaclass=Singleton):
         try:
             self.loop.run_forever()
         finally:
+            pending = asyncio.Task.all_tasks()
+            for task in pending:
+                task.cancel()
+                with suppress(asyncio.CancelledError):
+                    self.loop.run_until_complete(task)
             if GlobalObject().http_server:
                 GlobalObject().http_server.close()
                 self.loop.run_until_complete(GlobalObject().http_server.wait_closed())
