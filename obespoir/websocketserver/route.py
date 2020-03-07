@@ -40,7 +40,7 @@ class WebsocketHandler(object, metaclass=Singleton):
         pass
 
     async def websocket_handler(self, websocket, path):
-        print(websocket.remote_address, path)
+        logger.debug("websocket_handler: {}, {}".format(websocket.remote_address, path))
         while True:
             try:
                 data = await asyncio.wait_for(websocket.recv(), timeout=GlobalObject().ws_timeout)

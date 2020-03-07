@@ -42,7 +42,7 @@ pip3 install -i https://pypi.python.org/simple obEspoir
 ```json
 "route": {                     //配置消息转发的路由
             "range": {
-                "route": [[0, 5000]], "service": [[5001, 10000]]
+                "route": [[0, 5000]], "service": [[5001, 1000000]]
             },
             "special": {
                 "route":  [1000] // like "proxy": [110119]
@@ -126,7 +126,7 @@ route路由类型节点参考配置（大多和proxy相同）：
         // rpc会收到三类消息：待本地处理消息、待转发的消息、待直接推送到websocket client的消息
         "route": {                     //配置消息转发的路由
             "range": {
-                "route": [[0, 5000]], "service": [[5001, 10000]]
+                "route": [[0, 5000]], "service": [[5001, 1000000]]
             },
             "special": {
                 "route":  [1000] // like "proxy": [110119]
@@ -180,7 +180,7 @@ service业务节点参考配置(大多和proxy相同)：
         // rpc会收到三类消息：待本地处理消息、待转发的消息、待直接推送到websocket client的消息
         "route": {                     //配置消息转发的路径
             "range": {
-                "service": [[5001, 10000]]
+                "service": [[5001, 1000000]]
             },
             "special": {
                             // like "proxy": [110119]
@@ -320,10 +320,12 @@ async def forward_0(command_id, data, session_id):
 在项目中有一个test文件目录，其中为简单的测试demo，启动时执行以下文件即可
 
 ```shell
+服务端启动：
 python3 start_route.py        # 启动一个route类型节点
 python3 start_proxy.py			  # 启动一个proxy类型节点
 python3 start_service.py		  # 启动一个service类型节点
 
+测试客户端：
 python3 test_frame.py     #  客户端测试文件
 ```
 

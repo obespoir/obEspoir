@@ -20,11 +20,11 @@ async def forward_0(command_id, data, session_id):
     :param session_id: string
     :return: None
     """
-    print("forward_0", command_id, data, type(data), data, session_id)
+    logger.debug("forward_0:{}".format([command_id, data, type(data), data, session_id]))
     if not isinstance(data, dict):
         try:
             data = ujson.loads(data)
-            print("data type :", type(data))
+            logger.debug("data type :{}".format(type(data)))
         except Exception:
             logger.warn("param data parse error {}".format(data))
             return {}

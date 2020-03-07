@@ -115,7 +115,7 @@ class ObLog(object):
             msg = "{0}/{1}".format(msg, str(args))
         if kwargs:
             msg = "{0}/{1}".format(msg, str(kwargs))
-        print(msg)
+        print("<DEBUG> ", msg)
 
     def debug(self, msg, *args, **kwargs):
         if self.normal_log.isEnabledFor(DEBUG):

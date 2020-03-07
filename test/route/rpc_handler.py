@@ -9,18 +9,18 @@ from obespoir.rpcserver.push_lib import push_message
 from obespoir.share.ob_log import logger
 
 
-@RegisterEvent(100002)
+@RegisterEvent(1000)
 class LoginHandler(BaseHandler):
 
     async def execute(self, *args, **kwargs):
         logger.info("login_handler:{}  {}".format(args, kwargs))
-        user_id = self.params.get("user_id", -1)
+        user_name = self.params.get("name", "")
         passwd = self.params.get("passwd", "")
-        if -1 == user_id or not passwd:
+        if not user_name or not passwd:
             return {}
         # ...
         pass
-        return {"code": 200, "data": {}}
+        return {"code": 200, "data": {"user_id": 10, "desc": "恭喜，登录接口测试通过~"}}
 
 
 @RegisterEvent(100130, need_return=False)

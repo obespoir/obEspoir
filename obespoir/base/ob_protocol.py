@@ -45,7 +45,7 @@ class ObProtocol(asyncio.Protocol):
         if isinstance(data, str):
             data = bytes(data, encoding='utf8')
         self._buffer += data
-        _buffer = None
+        _buffer = b""
         if self._head is None:
             if len(self._buffer) < self.head_len:
                 return
@@ -58,13 +58,13 @@ class ObProtocol(asyncio.Protocol):
             data = self.encode_ins.decode(self._buffer[:content_len])  # 解密
             if not data:
                 raise DataException()
-            logger.info("hhhhhhhhhhhhhhhhhhh {}, {}".format(len(self._buffer), self._buffer[:100]))
+            logger.debug("receive a message data: {}, {}".format(len(self._buffer), self._buffer[:100]))
             asyncio.ensure_future(self.message_handle(self._head[1], self._head[2], data), loop=GlobalObject().loop)
 
             _buffer = self._buffer[content_len:]
             self._buffer = b""
             self._head = None
-        logger.info("here3333333: {}".format([len(_buffer), len(self._buffer), self._buffer[:100]]))
+        logger.info("process_data: {}".format([len(_buffer), len(self._buffer), self._buffer[:100]]))
         return _buffer
 
     async def message_handle(self, command_id, version, data):

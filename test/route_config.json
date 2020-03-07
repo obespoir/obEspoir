@@ -20,7 +20,7 @@
         // rpc会收到三类消息：待本地处理消息、待转发的消息、待直接推送到websocket client的消息
         "route": {                     //配置消息转发的路由
             "range": {
-                "route": [[0, 5000]], "service": [[5001, 10000]]
+                "route": [[0, 5000]], "service": [[5001, 50000]]
             },
             "special": {
                 "route":  [1000] // like "proxy": [110119]

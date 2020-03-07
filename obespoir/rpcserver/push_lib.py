@@ -34,13 +34,14 @@ def find_available_node(next_node_type, to=None):
     :param to: string, node name
     :return: connect node object id
     """
+    logger.debug("find_available_node:{}".format([next_node_type, to, RpcConnectionManager().conns]))
     while True:
         if to and to in RpcConnectionManager().conns.keys() and ConnectionStatus.ESTABLISHED == \
                 RpcConnectionManager().conns[to]["status"]:
             # 如果明确传输的目标，且和目标节点有直接可用的rpc连接，则直接通过该连接发送消息；
             next_node = to
         else:
-            if NodeType.ROUTE == next_node_type:
+            if not next_node_type or NodeType.ROUTE == next_node_type:
                 # 选取一个可用的route节点
                 next_node = RpcConnectionManager().get_available_connection(NodeType.ROUTE)
             else:
@@ -51,9 +52,8 @@ def find_available_node(next_node_type, to=None):
 
             if not next_node:
                 logger.error("all route node dead!!!")
-                print("eeeeeeeee:", next_node_type, to, next_node)
+                # print("eeeeeeeee:", next_node_type, to, next_node)
                 raise Exception()
-                # await asyncio.sleep(1)
                 time.sleep(1)
                 continue
 
@@ -79,5 +79,5 @@ async def push_message(next_node_type, command_id, message, session_id=None, to=
     if not next_node:
         next_node = find_available_node(next_node_type, to=to)
     SessionCache().add_cache(session_id, node_type=next_node_type, node_id=next_node)
-    print("push_message:", next_node, command_id, message, session_id, to)
+    logger.debug("push_message:{}".format([next_node, command_id, message, session_id, to]))
     await call_remote_service(next_node, command_id, message, session_id=session_id , to=to)

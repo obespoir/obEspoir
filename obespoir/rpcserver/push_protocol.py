@@ -34,9 +34,9 @@ class RpcPushProtocol(ObProtocol):
         self.transport = None
 
     async def send_message(self, command_id, message, session_id, to=None):
-        print("rpc push:", message, type(message))
+        logger.debug("rpc push:{}".format([message, type(message)]))
         data = self.pack(message, command_id, session_id, to)
-        print("rpc_push send_message:", data, type(data))
+        logger.debug("rpc_push send_message:{}".format([data, type(data)]))
         self.transport.write(data)
 
     async def message_handle(self, command_id, version, data):
@@ -47,11 +47,9 @@ class RpcPushProtocol(ObProtocol):
         :param data:
         :return:
         """
-        print("rpc push receive response message_handle:", command_id, data)
-        # result = await rpc_route.call_target(command_id, data)
+        logger.debug("rpc push receive response message_handle:{}".format([command_id, data]))
         result = await rpc_message_handle(command_id, data)
-        print("rpc result=", result)
-        # self.transport.write(self.pack(result, command_id))
+        logger.debug("rpc result={}".format(result))
 
     def connection_made(self, transport):
         self.transport = transport
@@ -63,7 +61,7 @@ class RpcPushProtocol(ObProtocol):
         )
 
     def data_received(self, data):
-        logger.debug('rpc_push received response {!r}'.format(data))
+        logger.debug('rpc_push received response {}'.format(data))
         super().data_received(data)
 
     def eof_received(self):

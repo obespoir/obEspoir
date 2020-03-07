@@ -37,7 +37,7 @@ class RpcConnectionManager(object, metaclass=Singleton):
         """
         cur_nodes = self.type_dict.get(node_type, [])
         available_nodes = []
-        print("get_available_connection: type_dict({}), conns({}), cur_nodes({})"
+        logger.debug("get_available_connection: type_dict({}), conns({}), cur_nodes({})"
               .format(self.type_dict, self.conns, cur_nodes))
         for name in cur_nodes:
             if ConnectionStatus.ESTABLISHED == self.conns[name]["status"]:
@@ -45,7 +45,7 @@ class RpcConnectionManager(object, metaclass=Singleton):
         return random.choice(available_nodes)
 
     def store_connection(self, host, port, connect, status=ConnectionStatus.LOSE):
-        print("store_connection:", host, port, connect)
+        logger.debug("store_connection:{}".format([host, port, connect]))
         self.conns[RpcConnectionManager.gen_node_name(host, port)] = {
             "status": status, "conn": connect, "host": host, "port": port}
 
@@ -88,7 +88,6 @@ class RpcConnectionManager(object, metaclass=Singleton):
         :return:
         """
         if node_name not in self.conns.keys():
-            print("sssssssss:", self.conns)
             logger.warn("can not find connection {}".format(node_name))
             return
 
@@ -103,9 +102,9 @@ class RpcConnectionManager(object, metaclass=Singleton):
                     logger.error("exceed max reconnect times {}".format(node_name))
                     return
 
-        if not isinstance(data, str):
-            data = ujson.dumps(data)
-        print(data, data.encode("utf8"), type(data))
+        # if not isinstance(data, str):
+        #     data = ujson.dumps(data)
+        # print(data, data.encode("utf8"), type(data))
         await self.conns[node_name]["conn"].send_message(command_id, data, session_id=session_id , to=to)
         logger.debug("rpcserver send {0}".format(data))
         return 1

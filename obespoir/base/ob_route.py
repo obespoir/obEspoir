@@ -84,7 +84,7 @@ class ObRoute(object):
 
             if iscoroutine(result):
                 result = await result
-            print("call_target result:", result)
+            logger.debug("call_target result:{}".format(result))
             return result
         finally:
             self._lock.release()

@@ -38,19 +38,13 @@ class RpcProtocol(ObProtocol):
         :param data:
         :return:
         """
-        print("rpc protocol message_handle:", command_id, data)
-        # result = await rpc_route.call_target(command_id, data)
+        # print("rpc protocol message_handle:", command_id, data)
         result = await rpc_message_handle(command_id, data)
-        print("rpc result=", result)
-        # self.transport.write(self.pack(result, command_id))
-        # await RpcConnectionManager().send_message(command_id=command_id, data=self.pack(result, command_id))
-        # self.transport.write(self.pack(result, command_id))
+        logger.debug("rpc result={}".format(result))
 
     def connection_made(self, transport):
         self.transport = transport
-        # self.address = transport.get_extra_info('peername')
         address = transport.get_extra_info('peername')
-        # RpcConnectionManager().store_connection(*address, self)
         logger.debug('connection accepted {}'.format(address))
 
     def data_received(self, data):

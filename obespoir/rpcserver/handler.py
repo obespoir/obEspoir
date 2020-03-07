@@ -13,7 +13,6 @@ class DefaultHandler(BaseHandler):
 
     async def execute(self, *args, **kwargs):
         logger.info("default handler:{}  {}".format(args, kwargs))
-        print("aaaaaaaa:", self.command_id, self.session_id)
         return {"code": 200}
 
 
@@ -22,8 +21,8 @@ class LoginHandler(BaseHandler):
 
     async def execute(self, *args, **kwargs):
         logger.info("login_1000:{}  {}".format(args, kwargs))
-        print("aaaaaaaa:", self.command_id, self.session_id)
-        return {"code": 200}
+        # print("login_1000:", self.command_id, self.session_id)
+        return {"code": 200, "user_id": 10}
 
 
 @RegisterEvent(999, need_return=False)

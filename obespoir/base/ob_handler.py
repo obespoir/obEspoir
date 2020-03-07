@@ -3,12 +3,22 @@
 author = jamon
 """
 
+import ujson
+
 
 class BaseHandler(object):
     """
     基础命令处理类
     """
     def __init__(self, params, command_id, session_id):
+        """
+
+        :param params: dict
+        :param command_id:
+        :param session_id:
+        """
+        if not isinstance(params, dict):
+            params = ujson.loads(params)
         self.params = params
         self.command_id = command_id
         self.session_id = session_id

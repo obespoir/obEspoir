@@ -13,6 +13,7 @@ from obespoir.base.global_object import GlobalObject
 from obespoir.base.ob_protocol import DataException
 from obespoir.rpcserver.session_cache import SessionCache
 from obespoir.share.encodeutil import AesEncoder
+from obespoir.share.ob_log import logger
 from obespoir.websocketserver.route import websocket_route
 from obespoir.websocketserver.manager import WebsocketConnectionManager
 
@@ -70,7 +71,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
 
     async def send_message(self, result, command_id):
         data = self.pack(result, command_id)
-        print("ddddddd:", data, type(self), self)
+        logger.debug("send_message:{}".format([data, type(self), self]))
         await self.send(data)
 
     def pack(self, data, command_id):
@@ -116,7 +117,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
         :param data:
         :return:
         """
-        print("message_handle:", data, websocket, type(websocket))
+        logger.debug("message_handle:{}".format([data, websocket, type(websocket)]))
         result = await websocket_route.call_target(command_id, data, session_id=self.session_id)
         if result:
             websocket.send(self.pack(result, command_id).decode("utf8"))

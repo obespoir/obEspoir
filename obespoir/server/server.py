@@ -116,7 +116,7 @@ class Server(object, metaclass=Singleton):
                         try:
                             self.loop.run_until_complete(remote_serv)
                         except ConnectionRefusedError:
-                            print("HERE", RpcConnectionManager().conns)
+                            logger.debug("config all conns:{}".format(RpcConnectionManager().conns))
                             logger.info("connecting to {}:{} failed!".format(host, port))
 
     async def update_remote_rpc_config(self):
@@ -169,7 +169,7 @@ class Server(object, metaclass=Singleton):
                         host = RpcConnectionManager().conns[name]["host"]
                         port = RpcConnectionManager().conns[name]["port"]
                         try:
-                            print("try to reconnect:",name,  host, port)
+                            logger.debug("try to reconnect:{}".format([name,  host, port]))
                             await self.loop.create_connection(RpcPushProtocol, host=host, port=port)
                             logger.info("success connect to {}:{}".format(host, port))
                         except ConnectionRefusedError as e:

@@ -10,7 +10,6 @@ if __name__ == "__main__":
 
 import logging
 
-from obespoir.rpcserver import handler
 from obespoir.share.ob_log import logger
 from obespoir.share.parse_json import ParseJson
 from obespoir.server.server import Server
