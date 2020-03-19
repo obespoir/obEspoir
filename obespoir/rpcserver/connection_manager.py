@@ -42,7 +42,7 @@ class RpcConnectionManager(object, metaclass=Singleton):
         for name in cur_nodes:
             if ConnectionStatus.ESTABLISHED == self.conns[name]["status"]:
                 available_nodes.append(name)
-        return random.choice(available_nodes)
+        return random.choice(available_nodes) if available_nodes else None
 
     def store_connection(self, host, port, connect, status=ConnectionStatus.LOSE):
         logger.debug("store_connection:{}".format([host, port, connect]))

@@ -35,7 +35,7 @@ class ObProtocol(asyncio.Protocol):
         :param command_id:  消息ID
         :return:
         """
-        data = ujson.dumps({"src": session_id, "to": to, "data": data})
+        data = ujson.dumps({"src": session_id, "to": to, "data": data, "prev": GlobalObject().type})
         data = self.encode_ins.encode(data)
         length = data.__len__() + self.head_len
         head = struct.pack(self.handfrt, length, command_id, self.version)

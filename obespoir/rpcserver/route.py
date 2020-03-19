@@ -26,11 +26,11 @@ async def call_target(command_id, data, session_id):
     if not obj:
         logger.error("command_id {} not register!".format(command_id))
         return
-    # print("bbbbbbb:", data, command_id, session_id)
+
     handler = obj.get("handler")(data, command_id, session_id)
     ret = await handler.execute()
-    # print("ccccccc:", ret, handler)
-    if obj.get("need_return"):
+    logger.debug("local call target result={}".format(ret))
+    if ret and obj.get("need_return"):      # 空消息不做推送
         to, _ = session_id.split("_")
         await push_message(None, command_id, ret, session_id, to)
 

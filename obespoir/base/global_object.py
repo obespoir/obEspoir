@@ -104,7 +104,7 @@ class GlobalObject(object, metaclass=Singleton):
         self.rpc_route = {"range": {}, "special": {}}
         for type_name, route in rpc_route.get("range", {}).items():
             self.rpc_route["range"][NodeType.get_type(type_name)] = route
-        for type_name, route in self.rpc_route.get("special", {}).items():
+        for type_name, route in rpc_route.get("special", {}).items():
             self.rpc_route["special"][NodeType.get_type(type_name)] = route
 
         return 1

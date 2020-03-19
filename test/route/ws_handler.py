@@ -32,7 +32,7 @@ async def forward_0(command_id, data, session_id):
             data = ujson.loads(data)
             print("data type :", type(data))
         except Exception:
-            logger.warn("param data parse error {}".format(data))
+            logger.warn("forward_0: param data parse error {}".format(data))
             return {}
     data.update({"message_id": command_id})
     await push_message(NodeType.ROUTE, command_id, data, session_id=session_id, to=None)
