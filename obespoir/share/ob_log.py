@@ -28,7 +28,7 @@ LOG_FILE_MAX_BYTES = 31457280
 LOG_FILE_BACKUP_COUNT = 1000
 LOG_LEVEL = logging.DEBUG
 
-FORMAT = '[%(asctime)s]-%(levelname)-8s<%(name)s> {%(filename)s:%(lineno)s} -> %(message)s'
+FORMAT = '[%(asctime)s]-%(levelname)-4s<%(name)s> {%(filename)s:%(lineno)s}-> %(message)s'
 formatter = logging.Formatter(FORMAT)
 
 
@@ -78,6 +78,8 @@ class ObLog(object):
         cur_date = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         if not self._normal or self.last_date != cur_date:
             self.last_date = cur_date
+            if self.name in logging.Logger.manager.loggerDict.keys():
+                logging.Logger.manager.loggerDict.pop(self.name)
             self._normal = self.get_normal_log(self.last_date)
         return self._normal
 
@@ -86,6 +88,9 @@ class ObLog(object):
         cur_date = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         if not self._error or self.last_date != cur_date:
             self.last_date = cur_date
+            name = self.name + '_error'
+            if name in logging.Logger.manager.loggerDict.keys():
+                logging.Logger.manager.loggerDict.pop(name)
             self._error = self.get_error_log(self.last_date)
         return self._error
 
@@ -139,7 +144,7 @@ class ObLog(object):
         if self.error_log.isEnabledFor(ERROR):
             self.normal_log._log(ERROR, msg, args, **kwargs)
             self.error_log._log(ERROR, msg, args, **kwargs)
-        print(msg, args, kwargs)
+        self._backup_print(msg, args, kwargs)
 
     def critical(self, msg, *args, **kwargs):
         if self.error_log.isEnabledFor(CRITICAL):
