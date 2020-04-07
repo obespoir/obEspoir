@@ -18,17 +18,19 @@ __all__ = [
     'FATAL']
 
 import os
+import sys
 import time
 import logging
 import logging.handlers
-from logging import getLogger, INFO, WARN, DEBUG, ERROR, FATAL, WARNING, CRITICAL
+from datetime import datetime
+from logging import getLogger, INFO, WARN, DEBUG, ERROR, FATAL, WARNING, CRITICAL, _levelToName
 
 
 LOG_FILE_MAX_BYTES = 31457280
 LOG_FILE_BACKUP_COUNT = 1000
 LOG_LEVEL = logging.DEBUG
 
-FORMAT = '[%(asctime)s]-%(levelname)-4s<%(name)s> {%(filename)s:%(lineno)s}-> %(message)s'
+FORMAT = '[%(asctime)s | %(levelname)s %(filename)s:%(lineno)s(%(funcName)s)] -> %(message)s'
 formatter = logging.Formatter(FORMAT)
 
 
@@ -52,6 +54,7 @@ class ObLog(object):
         self.name = None
         self.log_dir = None
         self.last_date = time.strftime('%Y-%m-%d', time.localtime(time.time()))   # 存放上一次打印日志的时间(字符串)
+        self.log_type = "both"    # log_type: both|log|print
 
     def get_normal_log(self, date_format):
         file_name = '{0}/{1}_{2}.log'.format(self.log_dir, self.name, date_format)
@@ -94,10 +97,13 @@ class ObLog(object):
             self._error = self.get_error_log(self.last_date)
         return self._error
 
-    def init(self, module_name, log_dir, level):
+    def init(self, module_name, log_dir=None, level="debug", log_type="both"):
         self.set_module_name(module_name)
-        self.set_log_dir(log_dir)
-        self.set_level(level_dict.get(level))
+        self.log_type = log_type
+        if "print" != self.log_type:
+            if log_dir:
+                self.set_log_dir(log_dir)
+            self.set_level(level_dict.get(level))
 
     def set_module_name(self, name):
         self.name = name
@@ -115,46 +121,66 @@ class ObLog(object):
     def set_level(self, level):
         self.normal_log.setLevel(level)
 
-    def _backup_print(self, msg, *args, **kwargs):
-        if args:
+    def _backup_print(self, level, msg, *args, **kwargs):
+        back_file = sys._getframe().f_back.f_back
+        rel_name = back_file.f_globals["__name__"].replace(".", "/") + ".py"
+        cur_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+
+        if args and args[0] and args[-1]:
             msg = "{0}/{1}".format(msg, str(args))
         if kwargs:
             msg = "{0}/{1}".format(msg, str(kwargs))
-        print("<DEBUG> ", msg)
+        print("[{0} {1} {2}:{3}({4})] -> {5} "
+              .format(cur_time, _levelToName.get(level, "debug"), rel_name, back_file.f_code.co_name, back_file.f_lineno, msg))
 
     def debug(self, msg, *args, **kwargs):
-        if self.normal_log.isEnabledFor(DEBUG):
+        if self.log_type != "log":
+            self._backup_print(DEBUG, msg, args, kwargs)
+
+        if self.log_type != "print" and self.normal_log.isEnabledFor(DEBUG):
             self.normal_log._log(DEBUG, msg, args, **kwargs)
-            self._backup_print(msg, args, kwargs)
 
     def info(self, msg, *args, **kwargs):
-        if self.normal_log.isEnabledFor(INFO):
+        if self.log_type != "log":
+            self._backup_print(INFO, msg, args, kwargs)
+
+        if self.log_type != "print" and self.normal_log.isEnabledFor(INFO):
             self.normal_log._log(INFO, msg, args, **kwargs)
-            self._backup_print(msg, args, kwargs)
 
     def warning(self, msg, *args, **kwargs):
-        if self.normal_log.isEnabledFor(WARN):
+        if self.log_type != "log":
+            self._backup_print(WARNING, msg, args, kwargs)
+
+        if self.log_type != "print" and self.normal_log.isEnabledFor(WARNING):
             self.normal_log._log(WARNING, msg, args, **kwargs)
 
     def warn(self, msg, *args, **kwargs):
-        if self.normal_log.isEnabledFor(WARN):
+        if self.log_type != "log":
+            self._backup_print(WARN, msg, args, kwargs)
+
+        if self.log_type != "print" and self.normal_log.isEnabledFor(WARN):
             self.normal_log._log(WARN, msg, args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
-        if self.error_log.isEnabledFor(ERROR):
+        if self.log_type != "log":
+            self._backup_print(ERROR, msg, args, kwargs)
+
+        if self.log_type != "print" and self.error_log.isEnabledFor(ERROR):
             self.normal_log._log(ERROR, msg, args, **kwargs)
-            self.error_log._log(ERROR, msg, args, **kwargs)
-        self._backup_print(msg, args, kwargs)
 
     def critical(self, msg, *args, **kwargs):
-        if self.error_log.isEnabledFor(CRITICAL):
+        if self.log_type != "log":
+            self._backup_print(CRITICAL, msg, args, kwargs)
+
+        if self.log_type != "print" and self.error_log.isEnabledFor(CRITICAL):
             self.normal_log._log(CRITICAL, msg, args, **kwargs)
-            self.error_log._log(CRITICAL, msg, args, **kwargs)
 
     def fatal(self, msg, *args, **kwargs):
-        if self.error_log.isEnabledFor(FATAL):
+        if self.log_type != "log":
+            self._backup_print(FATAL, msg, args, kwargs)
+
+        if self.log_type != "print" and self.error_log.isEnabledFor(FATAL):
             self.normal_log._log(FATAL, msg, args, **kwargs)
-            self.error_log._log(FATAL, msg, args, **kwargs)
 
 
 logger = ObLog()
